@@ -69,8 +69,8 @@ export default function Header({ setMobileOpen }) {
           <Menu size={20} />
         </button>
 
-        <div className="hidden sm:block">
-          <nav className="flex items-center space-x-1.5 text-[11px] font-sans text-slate-400">
+        <div>
+          <nav className="hidden sm:flex items-center space-x-1.5 text-[11px] font-sans text-slate-400">
             {generateBreadcrumbs().map((b, idx) => {
               const isLast = idx === generateBreadcrumbs().length - 1;
               return (
@@ -89,7 +89,7 @@ export default function Header({ setMobileOpen }) {
               );
             })}
           </nav>
-          <h1 className="mt-0.5 text-base md:text-[17px] font-extrabold font-sans text-slate-900 tracking-tight">
+          <h1 className="mt-0.5 text-sm sm:text-base md:text-[17px] font-extrabold font-sans text-slate-900 tracking-tight">
             {t(getPageTitle())}
           </h1>
         </div>
