@@ -4,8 +4,10 @@ import { dispatchApi } from '@/api/dispatch.api';
 import { evmApi } from '@/api/evm.api';
 import { useToast } from '@/components/common/Toast';
 import { useAuthStore } from '@/store/authStore';
+import { useTranslation } from '@/components/common/LanguageContext';
 
 export function useDispatch() {
+  const { t } = useTranslation();
   const { addToast } = useToast();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
@@ -40,7 +42,7 @@ export function useDispatch() {
   // 2. Lookup scanned barcode
   const lookupUnit = useCallback(async (code) => {
     if (scannedUnits.some((u) => u.unitCode === code)) {
-      addToast('Unit is already added to this batch', 'warning');
+      addToast(t('Unit is already added to this batch'), 'warning');
       return;
     }
 
@@ -70,7 +72,7 @@ export function useDispatch() {
         addToast(err.response?.data?.error?.message || `Failed to look up unit ${code}.`, 'error');
       }
     }
-  }, [scannedUnits, addToast]);
+  }, [scannedUnits, addToast, t]);
 
   const addRegisteredUnitToQueue = useCallback((unit) => {
     setScannedUnits((prev) => [...prev, unit]);

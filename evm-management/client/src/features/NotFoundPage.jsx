@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import Button from '@/components/common/Button';
 import { HelpCircle, ArrowLeft, Home } from 'lucide-react';
+import { useTranslation } from '@/components/common/LanguageContext';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4 relative overflow-hidden select-none">
@@ -36,10 +38,10 @@ export default function NotFoundPage() {
           404
         </h2>
         <h3 className="text-sm font-bold text-gray-800 font-sans mt-2.5">
-          Resource Ledger Entry Not Found
+          {t('Resource Entry Not Found')}
         </h3>
         <p className="text-xs text-gray-500 font-sans mt-2 max-w-xs mx-auto leading-normal">
-          The directory path or registry segment you requested does not exist or has been archived.
+          {t('The directory path or registry segment you requested does not exist or has been archived.')}
         </p>
 
         <div className="mt-8 flex flex-col gap-2">
@@ -50,7 +52,7 @@ export default function NotFoundPage() {
               className="w-full text-xs font-bold cursor-pointer"
             >
               <span className="flex items-center justify-center gap-1.5">
-                <Home size={14} /> Return to Dashboard
+                <Home size={14} /> {t('Return to Dashboard')}
               </span>
             </Button>
           ) : (
@@ -60,7 +62,7 @@ export default function NotFoundPage() {
               className="w-full text-xs font-bold cursor-pointer"
             >
               <span className="flex items-center justify-center gap-1.5">
-                <ArrowLeft size={14} /> Return to Login
+                <ArrowLeft size={14} /> {t('Return to Login')}
               </span>
             </Button>
           )}
@@ -70,13 +72,13 @@ export default function NotFoundPage() {
             variant="secondary"
             className="w-full text-xs font-bold cursor-pointer bg-gray-50 hover:bg-gray-100 border-gray-300"
           >
-            Go Back
+            {t('Go Back')}
           </Button>
         </div>
       </div>
 
       <div className="mt-8 text-center text-[10px] text-slate-400 font-sans font-medium">
-        <p>Madhya Pradesh State Election Commission Portal &bull; 404 Error Log Generated</p>
+        <p>{t('Madhya Pradesh State Election Commission Portal • 404 Error Log Generated')}</p>
       </div>
     </div>
   );

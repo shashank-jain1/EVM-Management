@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useTranslation } from '@/components/common/LanguageContext';
 
 const STATUS_STYLES = {
   // EVM Status
@@ -42,6 +43,7 @@ const STATUS_STYLES = {
  * @param {boolean} dot - show dot indicator
  */
 export default function Badge({ status, label, dot = true, className }) {
+  const { t } = useTranslation();
   const style = STATUS_STYLES[status] || {
     bg: 'bg-gray-100', text: 'text-gray-700', dot: 'bg-gray-400', label: status
   };
@@ -55,7 +57,7 @@ export default function Badge({ status, label, dot = true, className }) {
       )}
     >
       {dot && <span className={clsx('w-1.5 h-1.5 rounded-full shrink-0', style.dot)} aria-hidden="true" />}
-      {displayLabel}
+      {t(displayLabel)}
     </span>
   );
 }

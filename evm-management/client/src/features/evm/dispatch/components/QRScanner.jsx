@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { VideoOff, Volume2, VolumeX, Camera, RotateCcw, Keyboard, Flashlight } from 'lucide-react';
 import Button from '@/components/common/Button';
+import { useTranslation } from '@/components/common/LanguageContext';
 
 const SUPPORTED_FORMATS = [
   BarcodeFormat.QR_CODE,
@@ -17,6 +18,7 @@ const SUPPORTED_FORMATS = [
 ];
 
 export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
+  const { t } = useTranslation();
   const [phase, setPhase] = useState('init');   // init | scanning | error | noCam
   const [errorMsg, setErrorMsg] = useState('');
   const [errorName, setErrorName] = useState('');
@@ -36,6 +38,7 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
   const lastCodeRef = useRef('');
   const lastTimeRef = useRef(0);
   const activeInitIdRef = useRef(0);
+  const isLockedRef = useRef(false);
 
   useEffect(() => { callbackRef.current = onScanSuccess; }, [onScanSuccess]);
 
@@ -61,8 +64,18 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
   const handleDecode = useCallback((text) => {
     const code = (text || '').trim();
     if (!code) return;
+    if (isLockedRef.current) return;
+
     const now = Date.now();
-    if (code === lastCodeRef.current && now - lastTimeRef.current < 2000) return;
+    // Same-code cooldown of 4 seconds to prevent duplicate scan events
+    if (code === lastCodeRef.current && now - lastTimeRef.current < 4000) return;
+
+    // Lock scanning for 2 seconds globally
+    isLockedRef.current = true;
+    setTimeout(() => {
+      isLockedRef.current = false;
+    }, 2000);
+
     lastCodeRef.current = code;
     lastTimeRef.current = now;
     playBeep();
@@ -226,7 +239,7 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
         } catch (_) {}
       }
     };
-  }, [initializeCamera]);
+  }, []); // eslint-disable-next-line react-hooks/exhaustive-deps
 
   // ── Handle camera selection change ──────────────────────────────────────────
   const handleCameraChange = async (e) => {
@@ -391,7 +404,7 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
         {phase === 'scanning' && !flashOn && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-mono uppercase tracking-widest pointer-events-none">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Hold barcode steady inside frame
+            {t('Hold barcode steady inside frame')}
           </div>
         )}
 
@@ -401,7 +414,7 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
             <VideoOff size={26} className="text-red-400" />
             <p className="text-[11px] text-red-300 font-sans leading-relaxed max-w-xs">{errorMsg}</p>
             <Button onClick={retry} variant="ghost" size="sm" className="text-white border border-white/25 text-[11px] cursor-pointer">
-              <RotateCcw size={13} className="mr-1.5" /> Retry Camera
+              <RotateCcw size={13} className="mr-1.5" /> {t('Retry Camera')}
             </Button>
           </div>
         )}
@@ -410,7 +423,7 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
       {/* ── Last scanned code ─────────────────────────────────────────────────── */}
       {lastCode && (
         <div className="max-w-lg mx-auto p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 shadow-sm">
-          <span className="text-[11px] font-semibold text-emerald-700 font-sans shrink-0">Last scan:</span>
+          <span className="text-[11px] font-semibold text-emerald-700 font-sans shrink-0">{t('Last scan:')}</span>
           <code className="flex-1 text-xs font-mono font-bold text-navy-950 bg-white border border-emerald-200 px-2 py-0.5 rounded shadow-sm truncate">
             {lastCode}
           </code>
@@ -429,7 +442,7 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
                 ? 'border-gray-200 bg-white text-gray-600 hover:bg-gray-100' 
                 : 'border-red-200 bg-red-50 text-red-500 hover:bg-red-100'
             }`}
-            title={soundOn ? 'Mute scan sound' : 'Unmute scan sound'}
+            title={soundOn ? t('Mute scan sound') : t('Unmute scan sound')}
           >
             {soundOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
           </button>
@@ -446,7 +459,7 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
               }`}
             >
               <Keyboard size={13} />
-              <span>Type Code</span>
+              <span>{t('Type Code')}</span>
             </button>
           )}
         </div>
@@ -486,6 +499,7 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
 
 // ── Manual Entry sub-component ───────────────────────────────────────────────
 function ManualEntry({ value, onChange, onSubmit }) {
+  const { t } = useTranslation();
   return (
     <form
       onSubmit={onSubmit}
@@ -493,7 +507,7 @@ function ManualEntry({ value, onChange, onSubmit }) {
     >
       <div className="flex-1">
         <label className="block text-[10px] text-gray-400 uppercase font-bold font-sans mb-1">
-          Enter Unit Code Manually
+          {t('Enter Unit Code Manually')}
         </label>
         <input
           type="text"
@@ -512,7 +526,7 @@ function ManualEntry({ value, onChange, onSubmit }) {
         disabled={!value.trim()}
         className="h-10 px-4 bg-navy-950 text-white text-xs font-bold rounded-lg hover:bg-navy-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
       >
-        Add Code
+        {t('Add Code')}
       </button>
     </form>
   );

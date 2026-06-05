@@ -3,8 +3,10 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import clsx from 'clsx';
+import { useTranslation } from '@/components/common/LanguageContext';
 
 export default function AdminLayout() {
+  const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
@@ -64,7 +66,7 @@ export default function AdminLayout() {
         </main>
 
         <footer className="py-4 text-center border-t border-slate-200/40 bg-white/40 backdrop-blur-md text-[11px] text-slate-400 font-sans font-medium mt-auto">
-          EVM Inventory Management system &copy; {new Date().getFullYear()} Madhya Pradesh State Election Commission. All rights reserved.
+          {t('EVM Inventory Management system')} &copy; {new Date().getFullYear()} {t('Madhya Pradesh State Election Commission')}. {t('All rights reserved.')}
         </footer>
       </div>
     </div>
