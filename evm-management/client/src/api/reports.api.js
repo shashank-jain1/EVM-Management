@@ -2,7 +2,7 @@ import api from './axiosInstance';
 
 export const reportsApi = {
   dashboard: () => api.get('/reports/dashboard'),
-  inventorySummary: () => api.get('/reports/inventory-summary'),
+  inventorySummary: (params) => api.get('/reports/inventory-summary', { params }),
   statusBreakdown: () => api.get('/reports/status-breakdown'),
   dispatchHistory: (params) => api.get('/reports/dispatch-history', { params }),
   movementTimeline: (params) => api.get('/reports/movement-timeline', { params }),

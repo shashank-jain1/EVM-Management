@@ -86,7 +86,8 @@ export default function RegisterScannedUnitModal({ isOpen, onClose, code, onRegi
     },
     onError: (err) => {
       console.error(err);
-      addToast(err.response?.data?.error?.message || t('Failed to register EVM unit.'), 'error');
+      const msg = err.response?.data?.error?.message || err.response?.statusText || err.message || t('Failed to register EVM unit.');
+      addToast(`${t('Failed to register EVM unit.')} (${msg})`, 'error');
     },
   });
 
@@ -101,8 +102,8 @@ export default function RegisterScannedUnitModal({ isOpen, onClose, code, onRegi
       manufacturer: 'Bharat Electronics Limited (BEL)',
       manufacturingYear: new Date().getFullYear(),
       serialNumber: data.unitCode,
-      stateId: user?.stateId || 1,
-      districtId: user?.districtId || null,
+      stateId: user?.stateId ? parseInt(user.stateId, 10) : 1,
+      districtId: user?.districtId ? parseInt(user.districtId, 10) : null,
       locationDescription: finalLocation,
     };
 

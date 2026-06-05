@@ -266,6 +266,7 @@ export default function DispatchPage() {
                 options={(statesQuery.data || []).map((s) => ({ label: s.stateName ?? s.StateName, value: s.stateId != null ? String(s.stateId) : s.StateId != null ? String(s.StateId) : '' }))}
                 isLoading={statesQuery.isLoading}
                 placeholder={t('Select State')}
+                searchable={true}
                 required
               />
 
@@ -277,6 +278,7 @@ export default function DispatchPage() {
                 disabled={!toStateId}
                 isLoading={districtsQuery.isLoading}
                 placeholder={toStateId ? t('Select District') : t('Select State First')}
+                searchable={true}
               />
             </div>
 

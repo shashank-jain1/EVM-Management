@@ -279,6 +279,7 @@ export default function UsersPage() {
             options={(statesQuery.data || []).map((s) => ({ label: s.stateName ?? s.StateName, value: s.stateId != null ? String(s.stateId) : s.StateId != null ? String(s.StateId) : '' }))}
             isLoading={statesQuery.isLoading}
             placeholder={t('All States')}
+            searchable={true}
           />
 
           <Select
@@ -289,6 +290,7 @@ export default function UsersPage() {
             disabled={!selectedState}
             isLoading={districtsQuery.isLoading}
             placeholder={selectedState ? t('All Districts') : t('Select State First')}
+            searchable={true}
           />
 
           <Select

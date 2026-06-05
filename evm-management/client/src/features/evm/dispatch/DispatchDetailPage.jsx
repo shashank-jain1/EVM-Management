@@ -33,7 +33,7 @@ export default function DispatchDetailPage() {
     queryKey: ['dispatchBatch', id],
     queryFn: async () => {
       const res = await dispatchApi.get(id);
-      return res.data;
+      return res.data.data;
     },
   });
 

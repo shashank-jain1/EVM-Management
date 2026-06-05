@@ -21,11 +21,49 @@ public class ReportsController : ControllerBase
         _db = db;
     }
 
-    /// <summary>GET /api/reports/inventory-summary — units by state/type/status</summary>
+    /// <summary>GET /api/reports/inventory-summary — units by state/district</summary>
     [HttpGet("reports/inventory-summary")]
-    public async Task<IActionResult> InventorySummary()
+    public async Task<IActionResult> InventorySummary([FromQuery] int? stateId, [FromQuery] int? districtId)
     {
-        var data = await _evmRepo.GetInventorySummaryAsync();
+        using var conn = _db.CreateConnection();
+        var conditions = new List<string> { "e.is_active = 1" };
+        var parameters = new DynamicParameters();
+
+        // Location restriction for non-admins
+        var userStateId = User.FindFirst("stateId") is { } s ? int.Parse(s.Value) : (int?)null;
+        var userDistrictId = User.FindFirst("districtId") is { } d ? int.Parse(d.Value) : (int?)null;
+
+        if (!User.IsInRole("ADMIN"))
+        {
+            if (User.IsInRole("DISTRICT_OFFICER"))
+            {
+                stateId = userStateId;
+                districtId = userDistrictId;
+            }
+            else if (User.IsInRole("STATE_OFFICER"))
+            {
+                stateId = userStateId;
+            }
+        }
+
+        if (stateId.HasValue) { conditions.Add("e.current_state_id = @StateId"); parameters.Add("StateId", stateId.Value); }
+        if (districtId.HasValue) { conditions.Add("e.current_district_id = @DistrictId"); parameters.Add("DistrictId", districtId.Value); }
+
+        var where = string.Join(" AND ", conditions);
+
+        var data = await conn.QueryAsync(
+            $@"SELECT s.state_name AS StateName, d.district_name AS DistrictName,
+                      COUNT(*) AS TotalUnits,
+                      SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS ControlUnits,
+                      SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS BallotUnits,
+                      SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS VvpatUnits
+               FROM evm_units e
+               LEFT JOIN states s ON e.current_state_id = s.state_id
+               LEFT JOIN districts d ON e.current_district_id = d.district_id
+               WHERE {where}
+               GROUP BY s.state_name, d.district_name
+               ORDER BY s.state_name, d.district_name", parameters);
+
         return Ok(ApiResponse<object>.Ok(data));
     }
 
@@ -39,59 +77,125 @@ public class ReportsController : ControllerBase
 
     /// <summary>GET /api/reports/dispatch-history — dispatch batches with date range filter</summary>
     [HttpGet("reports/dispatch-history")]
-    public async Task<IActionResult> DispatchHistory([FromQuery] DateTime? from, [FromQuery] DateTime? to, [FromQuery] int page = 1, [FromQuery] int limit = 50)
+    public async Task<IActionResult> DispatchHistory([FromQuery] DateTime? from, [FromQuery] DateTime? to, [FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         using var conn = _db.CreateConnection();
         var conditions = new List<string> { "1=1" };
         var parameters = new DynamicParameters();
+
+        // Location restriction for non-admins
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        var userStateId = User.FindFirst("stateId") is { } s ? int.Parse(s.Value) : (int?)null;
+        var userDistrictId = User.FindFirst("districtId") is { } d ? int.Parse(d.Value) : (int?)null;
+
+        if (role != "ADMIN")
+        {
+            if (role == "DISTRICT_OFFICER")
+            {
+                conditions.Add("(b.from_state_id = @StateId OR b.to_state_id = @StateId)");
+                conditions.Add("(b.from_district_id = @DistrictId OR b.to_district_id = @DistrictId OR b.from_district_id IS NULL OR b.to_district_id IS NULL)");
+                parameters.Add("StateId", userStateId);
+                parameters.Add("DistrictId", userDistrictId);
+            }
+            else if (role == "STATE_OFFICER")
+            {
+                conditions.Add("(b.from_state_id = @StateId OR b.to_state_id = @StateId)");
+                parameters.Add("StateId", userStateId);
+            }
+        }
+
         if (from.HasValue) { conditions.Add("b.dispatch_date >= @From"); parameters.Add("From", from.Value); }
         if (to.HasValue) { conditions.Add("b.dispatch_date <= @To"); parameters.Add("To", to.Value); }
+
+        var where = string.Join(" AND ", conditions);
+        var total = await conn.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM dispatch_batches b WHERE {where}", parameters);
+
         parameters.Add("Offset", (page - 1) * limit);
         parameters.Add("Limit", limit);
 
-        var where = string.Join(" AND ", conditions);
         var data = await conn.QueryAsync(
             $@"SELECT b.batch_id AS BatchId, b.batch_code AS BatchCode, b.dispatch_date AS DispatchDate,
+                      b.expected_arrival AS ExpectedArrival, b.actual_arrival AS ActualArrival,
                       b.dispatch_status AS DispatchStatus, b.total_units AS TotalUnits,
                       u.full_name AS DispatchedByName,
-                      fs.state_name AS FromStateName, ts.state_name AS ToStateName
+                      fs.state_name AS FromStateName, fd.district_name AS FromDistrictName,
+                      ts.state_name AS ToStateName, td.district_name AS ToDistrictName
                FROM dispatch_batches b
                JOIN users u ON b.dispatched_by = u.user_id
                JOIN states fs ON b.from_state_id = fs.state_id
+               LEFT JOIN districts fd ON b.from_district_id = fd.district_id
                JOIN states ts ON b.to_state_id = ts.state_id
+               LEFT JOIN districts td ON b.to_district_id = td.district_id
                WHERE {where}
                ORDER BY b.dispatch_date DESC
                OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY", parameters);
 
-        return Ok(ApiResponse<object>.Ok(data));
+        return Ok(ApiResponse<object>.Ok(data, pagination: new PaginationMeta
+        {
+            Page = page, Limit = limit, Total = total,
+            TotalPages = (int)Math.Ceiling((double)total / limit)
+        }));
     }
 
     /// <summary>GET /api/reports/movement-timeline — timeline of unit movements</summary>
     [HttpGet("reports/movement-timeline")]
-    public async Task<IActionResult> MovementTimeline([FromQuery] int? unitId, [FromQuery] int page = 1, [FromQuery] int limit = 50)
+    public async Task<IActionResult> MovementTimeline([FromQuery] int? unitId, [FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         using var conn = _db.CreateConnection();
+        var conditions = new List<string> { "1=1" };
         var parameters = new DynamicParameters();
-        var where = unitId.HasValue ? "WHERE h.unit_id = @UnitId" : "";
-        if (unitId.HasValue) parameters.Add("UnitId", unitId.Value);
+
+        // Location restriction for non-admins
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        var userStateId = User.FindFirst("stateId") is { } s ? int.Parse(s.Value) : (int?)null;
+        var userDistrictId = User.FindFirst("districtId") is { } d ? int.Parse(d.Value) : (int?)null;
+
+        if (role != "ADMIN")
+        {
+            if (role == "DISTRICT_OFFICER")
+            {
+                conditions.Add("((h.from_state_id = @StateId AND h.from_district_id = @DistrictId) OR (h.to_state_id = @StateId AND h.to_district_id = @DistrictId))");
+                parameters.Add("StateId", userStateId);
+                parameters.Add("DistrictId", userDistrictId);
+            }
+            else if (role == "STATE_OFFICER")
+            {
+                conditions.Add("(h.from_state_id = @StateId OR h.to_state_id = @StateId)");
+                parameters.Add("StateId", userStateId);
+            }
+        }
+
+        if (unitId.HasValue) { conditions.Add("h.unit_id = @UnitId"); parameters.Add("UnitId", unitId.Value); }
+
+        var where = string.Join(" AND ", conditions);
+        var total = await conn.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM evm_movement_history h WHERE {where}", parameters);
+
         parameters.Add("Offset", (page - 1) * limit);
         parameters.Add("Limit", limit);
 
         var data = await conn.QueryAsync(
             $@"SELECT h.history_id AS HistoryId, h.action_type AS ActionType, h.action_date AS ActionDate,
-                      e.unit_code AS UnitCode, u.full_name AS ActionBy,
-                      fs.state_name AS FromState, ts.state_name AS ToState, b.batch_code AS BatchCode
+                      e.unit_code AS UnitCode, e.unit_type AS UnitType, u.full_name AS ActionByName,
+                      fs.state_name AS FromStateName, fd.district_name AS FromDistrictName,
+                      ts.state_name AS ToStateName, td.district_name AS ToDistrictName,
+                      b.batch_code AS BatchCode, h.remarks AS Remarks
                FROM evm_movement_history h
                JOIN evm_units e ON h.unit_id = e.unit_id
                JOIN users u ON h.action_by = u.user_id
                LEFT JOIN states fs ON h.from_state_id = fs.state_id
+               LEFT JOIN districts fd ON h.from_district_id = fd.district_id
                LEFT JOIN states ts ON h.to_state_id = ts.state_id
+               LEFT JOIN districts td ON h.to_district_id = td.district_id
                LEFT JOIN dispatch_batches b ON h.batch_id = b.batch_id
-               {where}
+               WHERE {where}
                ORDER BY h.action_date DESC
                OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY", parameters);
 
-        return Ok(ApiResponse<object>.Ok(data));
+        return Ok(ApiResponse<object>.Ok(data, pagination: new PaginationMeta
+        {
+            Page = page, Limit = limit, Total = total,
+            TotalPages = (int)Math.Ceiling((double)total / limit)
+        }));
     }
 
     /// <summary>GET /api/reports/dashboard — dashboard KPI data</summary>

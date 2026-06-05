@@ -131,7 +131,9 @@ public class DispatchService : IDispatchService
     {
         var filters = new Dictionary<string, object?>();
         if (filter.FromStateId.HasValue) filters["FromStateId"] = filter.FromStateId;
+        if (filter.FromDistrictId.HasValue) filters["FromDistrictId"] = filter.FromDistrictId;
         if (filter.ToStateId.HasValue) filters["ToStateId"] = filter.ToStateId;
+        if (filter.ToDistrictId.HasValue) filters["ToDistrictId"] = filter.ToDistrictId;
         if (!string.IsNullOrEmpty(filter.Status)) filters["Status"] = filter.Status;
         if (filter.DateFrom.HasValue) filters["DateFrom"] = filter.DateFrom;
         if (filter.DateTo.HasValue) filters["DateTo"] = filter.DateTo;

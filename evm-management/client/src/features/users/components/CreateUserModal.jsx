@@ -148,6 +148,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }) {
             }))}
             isLoading={statesQuery.isLoading}
             render={Select}
+            searchable={true}
             required
           />
 
@@ -163,6 +164,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }) {
             isLoading={districtsQuery.isLoading}
             render={Select}
             placeholder={watchRole === 'STATE_OFFICER' ? t('State officers bypass districts') : t('Choose District')}
+            searchable={true}
           />
         </div>
 

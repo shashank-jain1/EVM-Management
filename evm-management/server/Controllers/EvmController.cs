@@ -16,11 +16,26 @@ public class EvmController : ControllerBase
     public EvmController(IEvmService evmService) => _evmService = evmService;
 
     private int CurrentUserId => int.Parse(User.FindFirst("userId")!.Value);
+    private int? CurrentStateId => User.FindFirst("stateId") is { } c ? int.Parse(c.Value) : null;
+    private int? CurrentDistrictId => User.FindFirst("districtId") is { } c ? int.Parse(c.Value) : null;
 
     /// <summary>GET /api/evm — paginated list with filters</summary>
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] EvmListFilter filter)
     {
+        if (!User.IsInRole("ADMIN"))
+        {
+            if (User.IsInRole("DISTRICT_OFFICER"))
+            {
+                filter.StateId = CurrentStateId;
+                filter.DistrictId = CurrentDistrictId;
+            }
+            else if (User.IsInRole("STATE_OFFICER"))
+            {
+                filter.StateId = CurrentStateId;
+            }
+        }
+
         var (units, total) = await _evmService.ListUnitsAsync(filter);
         return Ok(ApiResponse<object>.Ok(units, pagination: new PaginationMeta
         {
@@ -56,7 +71,7 @@ public class EvmController : ControllerBase
 
     /// <summary>POST /api/evm — register new EVM unit (admin only)</summary>
     [HttpPost]
-    [Authorize(Roles = "ADMIN,STATE_OFFICER")]
+    [Authorize(Roles = "ADMIN,STATE_OFFICER,DISTRICT_OFFICER")]
     public async Task<IActionResult> Register([FromBody] CreateEvmRequest request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);

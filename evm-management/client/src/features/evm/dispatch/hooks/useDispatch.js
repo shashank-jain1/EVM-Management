@@ -120,7 +120,7 @@ export function useDispatch() {
       toDistrictId: toDistrictId ? parseInt(toDistrictId) : null,
       expectedArrival: expectedArrival ? new Date(expectedArrival).toISOString() : null,
       remarks,
-      unitIds: scannedUnits.map((u) => u.unitId),
+      unitCodes: scannedUnits.map((u) => u.unitCode),
     };
 
     createDispatchMutation.mutate(payload);

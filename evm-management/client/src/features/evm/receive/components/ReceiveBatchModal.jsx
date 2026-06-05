@@ -106,22 +106,21 @@ export default function ReceiveBatchModal({ isOpen, onClose, batch }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const itemsPayload = Object.values(itemsState).map((item) => ({
-      itemId: item.itemId,
+    const receiptsPayload = Object.values(itemsState).map((item) => ({
       unitId: item.unitId,
-      received: item.received,
-      condition: item.received ? item.condition : null,
+      itemStatus: item.received ? 'RECEIVED' : 'MISSING',
+      conditionOnReceipt: item.received ? item.condition : null,
       remarks: item.remarks,
     }));
 
-    const unreceivedCount = itemsPayload.filter((i) => !i.received).length;
+    const unreceivedCount = receiptsPayload.filter((i) => i.itemStatus === 'MISSING').length;
     
     if (unreceivedCount > 0 && !window.confirm(`${t('Warning')}: ${t('You are flagging')} ${unreceivedCount} ${t('units as MISSING. This triggers an immediate security alert. Continue?')}`)) {
       return;
     }
 
     receiveMutation.mutate({
-      items: itemsPayload,
+      receipts: receiptsPayload,
     });
   };
 

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { reportsApi } from '@/api/reports.api';
+import { reportsApi, referenceApi } from '@/api/reports.api';
 import Table from '@/components/common/Table';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
 import Pagination from '@/components/common/Pagination';
+import Select from '@/components/common/Select';
+import { useAuthStore } from '@/store/authStore';
 import { format } from 'date-fns';
 import {
   FileSpreadsheet,
@@ -19,6 +21,33 @@ import { useTranslation } from '@/components/common/LanguageContext';
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState('inventory');
   const { t } = useTranslation();
+  const { user } = useAuthStore();
+
+  const [selectedState, setSelectedState] = useState(
+    user?.role !== 'ADMIN' && user?.stateId ? String(user.stateId) : ''
+  );
+  const [selectedDistrict, setSelectedDistrict] = useState(
+    user?.role === 'DISTRICT_OFFICER' && user?.districtId ? String(user.districtId) : ''
+  );
+
+  // States & Districts queries for filtering
+  const statesQuery = useQuery({
+    queryKey: ['states'],
+    queryFn: async () => {
+      const res = await referenceApi.getStates();
+      return res.data.data;
+    },
+    enabled: activeTab === 'inventory',
+  });
+
+  const districtsQuery = useQuery({
+    queryKey: ['districts', selectedState],
+    queryFn: async () => {
+      const res = await referenceApi.getDistricts(selectedState);
+      return res.data.data;
+    },
+    enabled: activeTab === 'inventory' && !!selectedState,
+  });
   
   // State variables for Dispatch tab pagination
   const [dispatchPage, setDispatchPage] = useState(1);
@@ -30,9 +59,12 @@ export default function ReportsPage() {
 
   // 1. Fetch Inventory Summary Report
   const inventoryQuery = useQuery({
-    queryKey: ['reportInventory'],
+    queryKey: ['reportInventory', selectedState, selectedDistrict],
     queryFn: async () => {
-      const res = await reportsApi.inventorySummary();
+      const res = await reportsApi.inventorySummary({
+        stateId: selectedState || undefined,
+        districtId: selectedDistrict || undefined,
+      });
       return res.data.data; // Expect array of { stateName, districtName, totalUnits, controlUnits, ballotUnits, vvpatUnits }
     },
     enabled: activeTab === 'inventory',
@@ -45,8 +77,8 @@ export default function ReportsPage() {
       const res = await reportsApi.dispatchHistory({ page: dispatchPage, limit: dispatchLimit });
       return {
         items: res.data.data || [],
-        totalPages: 1,
-        totalItems: (res.data.data || []).length
+        totalPages: res.data.pagination?.totalPages || 1,
+        totalItems: res.data.pagination?.total || 0
       };
     },
     enabled: activeTab === 'dispatch',
@@ -59,8 +91,8 @@ export default function ReportsPage() {
       const res = await reportsApi.movementTimeline({ page: timelinePage, limit: timelineLimit });
       return {
         items: res.data.data || [],
-        totalPages: 1,
-        totalItems: (res.data.data || []).length
+        totalPages: res.data.pagination?.totalPages || 1,
+        totalItems: res.data.pagination?.total || 0
       };
     },
     enabled: activeTab === 'timeline',
@@ -105,6 +137,46 @@ export default function ReportsPage() {
 
     return (
       <div className="space-y-4">
+        {/* Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50/50">
+          <Select
+            label={t('State')}
+            value={selectedState}
+            onChange={(val) => {
+              setSelectedState(val);
+              setSelectedDistrict('');
+            }}
+            options={(statesQuery.data || []).map((s) => ({ label: s.stateName ?? s.StateName, value: s.stateId != null ? String(s.stateId) : s.StateId != null ? String(s.StateId) : '' }))}
+            isLoading={statesQuery.isLoading}
+            placeholder={t('All States')}
+            disabled={user?.role !== 'ADMIN'}
+            searchable={true}
+          />
+
+          <Select
+            label={t('District')}
+            value={selectedDistrict}
+            onChange={setSelectedDistrict}
+            options={(districtsQuery.data || []).map((d) => ({ label: d.districtName ?? d.DistrictName, value: d.districtId != null ? String(d.districtId) : d.DistrictId != null ? String(d.DistrictId) : '' }))}
+            disabled={!selectedState || user?.role === 'DISTRICT_OFFICER'}
+            isLoading={districtsQuery.isLoading}
+            placeholder={selectedState ? t('All Districts') : t('Select State First')}
+            searchable={true}
+          />
+
+          <div className="flex items-end pb-0.5">
+            <button
+              onClick={() => {
+                setSelectedState(user?.role !== 'ADMIN' && user?.stateId ? String(user.stateId) : '');
+                setSelectedDistrict(user?.role === 'DISTRICT_OFFICER' && user?.districtId ? String(user.districtId) : '');
+              }}
+              className="h-9 px-4 text-xs font-bold text-gray-500 hover:text-saffron-600 transition-colors uppercase tracking-wider font-mono border border-gray-350 bg-white rounded-md w-full cursor-pointer hover:bg-gray-50"
+            >
+              {t('Reset Filters')}
+            </button>
+          </div>
+        </div>
+
         <div className="flex justify-between items-center pb-2 border-b border-gray-100">
           <h3 className="text-xs font-bold font-sans text-navy-900 uppercase tracking-wide flex items-center gap-1.5">
             <Grid size={15} className="text-gray-400" />

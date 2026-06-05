@@ -85,6 +85,27 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
     callbackRef.current?.(code);
   }, [playBeep]);
 
+  // ── Stop Camera Stream ──────────────────────────────────────────────────────
+  const stopCameraStream = useCallback(() => {
+    try {
+      const stream = videoRef.current?.srcObject;
+      if (stream && stream.getTracks) {
+        stream.getTracks().forEach((track) => {
+          try {
+            track.stop();
+          } catch (e) {
+            console.warn('[QRScanner] Error stopping track:', e);
+          }
+        });
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+    } catch (err) {
+      console.warn('[QRScanner] Error releasing camera stream:', err);
+    }
+  }, []);
+
   // ── Check Torch Support ──────────────────────────────────────────────────────
   const checkTorchSupport = useCallback(() => {
     try {
@@ -127,6 +148,9 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
   // ── Start scanning ───────────────────────────────────────────────────────────
   const startScanning = useCallback(async (deviceId) => {
     if (!videoRef.current) return;
+
+    stopCameraStream();
+
     if (codeReaderRef.current) {
       try {
         codeReaderRef.current.reset();
@@ -216,6 +240,8 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
     setTorchSupported(false);
     setTorchOn(false);
 
+    stopCameraStream();
+
     if (codeReaderRef.current) {
       try {
         codeReaderRef.current.reset();
@@ -226,20 +252,21 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
     if (myId !== activeInitIdRef.current) return;
 
     await startScanning(null);
-  }, [startScanning]);
+  }, [startScanning, stopCameraStream]);
 
   // ── Mount: auto-start ────────────────────────────────────────────────────────
   useEffect(() => {
     initializeCamera();
 
     return () => {
+      stopCameraStream();
       if (codeReaderRef.current) {
         try {
           codeReaderRef.current.reset();
         } catch (_) {}
       }
     };
-  }, []); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initializeCamera, stopCameraStream]);
 
   // ── Handle camera selection change ──────────────────────────────────────────
   const handleCameraChange = async (e) => {

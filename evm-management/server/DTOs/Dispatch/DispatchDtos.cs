@@ -25,7 +25,9 @@ public class ReceiveDispatchRequest
 public class DispatchListFilter
 {
     public int? FromStateId { get; set; }
+    public int? FromDistrictId { get; set; }
     public int? ToStateId { get; set; }
+    public int? ToDistrictId { get; set; }
     public string? Status { get; set; }
     public DateTime? DateFrom { get; set; }
     public DateTime? DateTo { get; set; }

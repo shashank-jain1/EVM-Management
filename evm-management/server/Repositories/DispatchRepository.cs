@@ -114,7 +114,9 @@ public class DispatchRepository : IDispatchRepository
         var parameters = new DynamicParameters();
 
         if (filters.TryGetValue("FromStateId", out var fs) && fs != null) { conditions.Add("b.from_state_id = @FromStateId"); parameters.Add("FromStateId", fs); }
+        if (filters.TryGetValue("FromDistrictId", out var fd) && fd != null) { conditions.Add("b.from_district_id = @FromDistrictId"); parameters.Add("FromDistrictId", fd); }
         if (filters.TryGetValue("ToStateId", out var ts) && ts != null) { conditions.Add("b.to_state_id = @ToStateId"); parameters.Add("ToStateId", ts); }
+        if (filters.TryGetValue("ToDistrictId", out var td) && td != null) { conditions.Add("b.to_district_id = @ToDistrictId"); parameters.Add("ToDistrictId", td); }
         if (filters.TryGetValue("Status", out var st) && st != null) { conditions.Add("b.dispatch_status = @Status"); parameters.Add("Status", st); }
         if (filters.TryGetValue("DateFrom", out var df) && df != null) { conditions.Add("b.dispatch_date >= @DateFrom"); parameters.Add("DateFrom", df); }
         if (filters.TryGetValue("DateTo", out var dt) && dt != null) { conditions.Add("b.dispatch_date <= @DateTo"); parameters.Add("DateTo", dt); }
@@ -157,14 +159,21 @@ public class DispatchRepository : IDispatchRepository
 
         if (districtId.HasValue)
         {
-            conditions.Add("(b.to_district_id = @DistrictId OR b.to_district_id IS NULL)");
+            conditions.Add("b.to_district_id = @DistrictId");
             parameters.Add("DistrictId", districtId.Value);
+            conditions.Add("NOT (b.from_state_id = @StateId AND b.from_district_id = @DistrictId)");
+        }
+        else
+        {
+            conditions.Add("b.to_district_id IS NULL");
+            conditions.Add("NOT (b.from_state_id = @StateId AND b.from_district_id IS NULL)");
         }
 
         using var conn = _db.CreateConnection();
         return (await conn.QueryAsync<DispatchBatch>(
             $@"SELECT b.batch_id AS BatchId, b.batch_code AS BatchCode, b.dispatch_date AS DispatchDate,
                       b.expected_arrival AS ExpectedArrival, b.dispatch_status AS DispatchStatus, b.total_units AS TotalUnits,
+                      b.remarks AS Remarks,
                       u.full_name AS DispatchedByName,
                       fs.state_name AS FromStateName, fd.district_name AS FromDistrictName,
                       DATEDIFF(DAY, b.dispatch_date, GETDATE()) AS DaysPending

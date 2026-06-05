@@ -23,6 +23,19 @@ public class DispatchController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] DispatchListFilter filter)
     {
+        if (!User.IsInRole("ADMIN"))
+        {
+            if (User.IsInRole("DISTRICT_OFFICER"))
+            {
+                filter.FromStateId = CurrentStateId;
+                filter.FromDistrictId = CurrentDistrictId;
+            }
+            else if (User.IsInRole("STATE_OFFICER"))
+            {
+                filter.FromStateId = CurrentStateId;
+            }
+        }
+
         var (batches, total) = await _dispatchService.ListBatchesAsync(filter);
         return Ok(ApiResponse<object>.Ok(batches, pagination: new PaginationMeta
         {

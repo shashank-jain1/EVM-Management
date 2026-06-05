@@ -18,12 +18,16 @@ export default function EVMListPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { t } = useTranslation();
-  const isAdminOrStateOfficer = user?.role === 'ADMIN' || user?.role === 'STATE_OFFICER';
+  const canRegister = user?.role === 'ADMIN' || user?.role === 'STATE_OFFICER' || user?.role === 'DISTRICT_OFFICER';
 
   // State filters
   const [search, setSearch] = useState('');
-  const [selectedState, setSelectedState] = useState('');
-  const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedState, setSelectedState] = useState(
+    user?.role !== 'ADMIN' && user?.stateId ? String(user.stateId) : ''
+  );
+  const [selectedDistrict, setSelectedDistrict] = useState(
+    user?.role === 'DISTRICT_OFFICER' && user?.districtId ? String(user.districtId) : ''
+  );
   const [selectedType, setSelectedType] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [page, setPage] = useState(1);
@@ -89,8 +93,8 @@ export default function EVMListPage() {
 
   const resetFilters = () => {
     setSearch('');
-    setSelectedState('');
-    setSelectedDistrict('');
+    setSelectedState(user?.role !== 'ADMIN' && user?.stateId ? String(user.stateId) : '');
+    setSelectedDistrict(user?.role === 'DISTRICT_OFFICER' && user?.districtId ? String(user.districtId) : '');
     setSelectedType('');
     setSelectedStatus('');
     setPage(1);
@@ -126,16 +130,7 @@ export default function EVMListPage() {
       accessor: 'unitType',
       render: (val) => <Badge status={val} />,
     },
-    {
-      header: t('Manufacturer'),
-      accessor: 'manufacturer',
-      render: (val, row) => <span className="text-xs text-gray-700">{val} ({row.manufacturingYear})</span>,
-    },
-    {
-      header: t('Serial Number'),
-      accessor: 'serialNumber',
-      render: (val) => <span className="font-mono text-xs text-gray-500">{val}</span>,
-    },
+
     {
       header: t('Current Location'),
       accessor: 'stateName',
@@ -177,7 +172,7 @@ export default function EVMListPage() {
             {t('Full registry of all Electronic Voting Machine devices allocated across India.')}
           </p>
         </div>
-        {isAdminOrStateOfficer && (
+        {canRegister && (
           <Button
             onClick={() => navigate('/evm/register')}
             variant="primary"
@@ -225,6 +220,8 @@ export default function EVMListPage() {
             options={(statesQuery.data || []).map((s) => ({ label: s.stateName ?? s.StateName, value: s.stateId != null ? String(s.stateId) : s.StateId != null ? String(s.StateId) : '' }))}
             isLoading={statesQuery.isLoading}
             placeholder={t('All States')}
+            disabled={user?.role !== 'ADMIN'}
+            searchable={true}
           />
 
           {/* District Dropdown */}
@@ -233,9 +230,10 @@ export default function EVMListPage() {
             value={selectedDistrict}
             onChange={handleFilterChange(setSelectedDistrict)}
             options={(districtsQuery.data || []).map((d) => ({ label: d.districtName ?? d.DistrictName, value: d.districtId != null ? String(d.districtId) : d.DistrictId != null ? String(d.DistrictId) : '' }))}
-            disabled={!selectedState}
+            disabled={!selectedState || user?.role === 'DISTRICT_OFFICER'}
             isLoading={districtsQuery.isLoading}
             placeholder={selectedState ? t('All Districts') : t('Select State First')}
+            searchable={true}
           />
 
           {/* Unit Type Dropdown */}
