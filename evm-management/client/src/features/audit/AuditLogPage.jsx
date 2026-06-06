@@ -22,6 +22,16 @@ export default function AuditLogPage() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [activeLog, setActiveLog] = useState(null);
 
+  const formatJsonValue = (val, fallback) => {
+    if (!val) return fallback;
+    try {
+      const parsed = JSON.parse(val);
+      return JSON.stringify(parsed, null, 2);
+    } catch {
+      return val;
+    }
+  };
+
   // 1. Fetch Audit Logs
   const auditLogsQuery = useQuery({
     queryKey: ['auditLogs', search, selectedAction, page],
@@ -124,7 +134,7 @@ export default function AuditLogPage() {
           className="text-gray-500 hover:text-navy-900 h-9 w-9 p-0 flex items-center justify-center cursor-pointer"
           title={t('Inspect Activity Log Details')}
         >
-          <Eye size={16} />
+          <Eye size={20} />
         </Button>
       ),
     },
@@ -166,7 +176,8 @@ export default function AuditLogPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="sm:col-span-2">
+          <div className="sm:col-span-2 flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">{t('Search Logs')}</label>
             <SearchInput
               value={search}
               onSearch={handleSearch}
@@ -232,15 +243,15 @@ export default function AuditLogPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <span className="text-[10px] text-gray-400 font-sans uppercase font-bold block mb-1.5">{t('Original State (Old Values)')}</span>
-                <pre className="p-3 bg-gray-50 border border-gray-200 rounded font-mono text-[10.5px] text-gray-700 overflow-auto max-h-56 leading-normal">
-                  {activeLog.oldValues ? JSON.stringify(JSON.parse(activeLog.oldValues), null, 2) : t('No original values captured (Create action)')}
+                <pre className="p-3 bg-gray-50 border border-gray-200 rounded font-mono text-[10.5px] text-gray-700 overflow-auto max-h-56 leading-normal whitespace-pre-wrap break-all">
+                  {formatJsonValue(activeLog.oldValues, t('No original values captured (Create action)'))}
                 </pre>
               </div>
 
               <div>
                 <span className="text-[10px] text-gray-400 font-sans uppercase font-bold block mb-1.5">{t('Modified State (New Values)')}</span>
-                <pre className="p-3 bg-gray-50 border border-gray-200 rounded font-mono text-[10.5px] text-gray-700 overflow-auto max-h-56 leading-normal">
-                  {activeLog.newValues ? JSON.stringify(JSON.parse(activeLog.newValues), null, 2) : t('No replacement values captured (Delete action)')}
+                <pre className="p-3 bg-gray-50 border border-gray-200 rounded font-mono text-[10.5px] text-gray-700 overflow-auto max-h-56 leading-normal whitespace-pre-wrap break-all">
+                  {formatJsonValue(activeLog.newValues, t('No replacement values captured (Delete action)'))}
                 </pre>
               </div>
             </div>
