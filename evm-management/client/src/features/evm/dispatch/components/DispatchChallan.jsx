@@ -26,14 +26,14 @@ const DispatchChallan = React.forwardRef(({ batch, items = [] }, ref) => {
             <div className="border border-navy-950 p-1 bg-gray-50 inline-block">
               <span className="font-mono text-xs block font-bold text-gray-900 leading-none tracking-widest">{batch.batchCode}</span>
             </div>
-            <span className="text-[9px] text-gray-400 font-mono block mt-1">SYSTEM CHALLAN BARCODE</span>
+            <span className="text-[9px] text-gray-400 font-mono block mt-1">SYSTEM RECEIPT BARCODE</span>
           </div>
         </div>
       </div>
 
       <div className="text-center mb-8">
-        <h3 className="text-base font-extrabold text-navy-950 uppercase tracking-wider underline">
-          EVM Shipment Gate Pass
+        <h3 className="text-base font-extrabold text-navy-955 uppercase tracking-wider underline">
+          EVM Shipment Receipt
         </h3>
       </div>
 
@@ -41,19 +41,13 @@ const DispatchChallan = React.forwardRef(({ batch, items = [] }, ref) => {
       <div className="grid grid-cols-2 gap-6 mb-8 border border-gray-250 p-4 rounded text-xs">
         <div className="space-y-2">
           <p>
-            <span className="font-bold text-gray-500 font-mono">CHALLAN NO: </span>
+            <span className="font-bold text-gray-500 font-mono">RECEIPT NO: </span>
             <span className="font-bold font-mono text-navy-900">{batch.batchCode}</span>
           </p>
           <p>
             <span className="font-bold text-gray-500">DISPATCH DATE: </span>
             <span className="font-semibold text-gray-800">
               {batch.dispatchDate ? format(new Date(batch.dispatchDate), 'dd MMM yyyy HH:mm') : '—'}
-            </span>
-          </p>
-          <p>
-            <span className="font-bold text-gray-500">EXPECTED ARRIVAL: </span>
-            <span className="font-semibold text-gray-800">
-              {batch.expectedArrival ? format(new Date(batch.expectedArrival), 'dd MMM yyyy') : '—'}
             </span>
           </p>
           <p>
@@ -81,12 +75,6 @@ const DispatchChallan = React.forwardRef(({ batch, items = [] }, ref) => {
             <span className="font-bold text-gray-500">TOTAL UNITS: </span>
             <span className="font-bold text-navy-900 font-mono text-sm">{batch.totalUnits} Units</span>
           </p>
-          {batch.remarks && (
-            <p>
-              <span className="font-bold text-gray-500">REMARKS: </span>
-              <span className="text-gray-700 italic">&ldquo;{batch.remarks}&rdquo;</span>
-            </p>
-          )}
         </div>
       </div>
 
@@ -103,8 +91,6 @@ const DispatchChallan = React.forwardRef(({ batch, items = [] }, ref) => {
               <th className="border border-gray-300 px-3 py-2 text-left font-bold">Box Number</th>
               <th className="border border-gray-300 px-3 py-2 text-left font-bold">Unit Code (Monospace)</th>
               <th className="border border-gray-300 px-3 py-2 text-left font-bold">Unit Type</th>
-              <th className="border border-gray-300 px-3 py-2 text-left font-bold">Serial Number</th>
-              <th className="border border-gray-300 px-3 py-2 text-left font-bold">Manufacturer</th>
               <th className="border border-gray-300 px-3 py-2 text-left font-bold">Condition on Dispatch</th>
             </tr>
           </thead>
@@ -119,15 +105,13 @@ const DispatchChallan = React.forwardRef(({ batch, items = [] }, ref) => {
                   <td className="border border-gray-300 px-3 py-2 text-gray-700">
                     {item.unitType?.replace('_', ' ') || 'CONTROL UNIT'}
                   </td>
-                  <td className="border border-gray-300 px-3 py-2 font-mono text-gray-500">{item.serialNumber || '—'}</td>
-                  <td className="border border-gray-300 px-3 py-2 text-gray-600">{item.manufacturer || '—'}</td>
                   <td className="border border-gray-300 px-3 py-2 text-gray-600 font-semibold text-emerald-700">SEALED GOOD</td>
                 </tr>
               );
             })}
             {items.length === 0 && (
               <tr>
-                <td colSpan={7} className="border border-gray-300 px-3 py-6 text-center text-gray-400">
+                <td colSpan={5} className="border border-gray-300 px-3 py-6 text-center text-gray-400">
                   No units associated with this dispatch batch.
                 </td>
               </tr>
@@ -157,8 +141,8 @@ const DispatchChallan = React.forwardRef(({ batch, items = [] }, ref) => {
 
       {/* Print footer */}
       <div className="mt-16 text-center text-[9px] text-gray-400 border-t border-gray-100 pt-3">
-        <p className="font-mono">Challan printed automatically via EVM Inventory Management system. Verification code: {batch.batchCode?.split('-')[2] || 'OK'}-{Date.now().toString().slice(-6)}</p>
-        <p className="mt-0.5">This document serves as a gate pass under Section 23 of State Election Commission Guidelines.</p>
+        <p className="font-mono">Receipt printed automatically via EVM Inventory Management system. Verification code: {batch.batchCode?.split('-')[2] || 'OK'}-{Date.now().toString().slice(-6)}</p>
+        <p className="mt-0.5">This document serves as a receipt under Section 23 of State Election Commission Guidelines.</p>
       </div>
     </div>
   );

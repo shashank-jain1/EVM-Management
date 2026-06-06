@@ -73,22 +73,20 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={() => setLanguage('en')}
-          className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all duration-150 cursor-pointer ${
-            language === 'en'
+          className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all duration-150 cursor-pointer ${language === 'en'
               ? 'bg-saffron-500 text-white shadow-sm'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-          }`}
+            }`}
         >
           EN
         </button>
         <button
           type="button"
           onClick={() => setLanguage('hi')}
-          className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all duration-150 cursor-pointer ${
-            language === 'hi'
+          className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider transition-all duration-150 cursor-pointer ${language === 'hi'
               ? 'bg-saffron-500 text-white shadow-sm'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-          }`}
+            }`}
         >
           हिन्दी
         </button>
@@ -120,11 +118,11 @@ export default function LoginPage() {
 
       {/* Sign In Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        
+
         {/* User Code Input */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-bold text-slate-700 uppercase tracking-wider">
-            {t('Officer User ID (User Code)')}
+            {t('User Id')}
           </label>
           <div className="relative group">
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-saffron-600 transition-colors pointer-events-none">
@@ -135,11 +133,10 @@ export default function LoginPage() {
               autoFocus
               {...register('userCode')}
               placeholder=""
-              className={`w-full bg-white text-slate-900 rounded-xl border pl-11 pr-4 py-2.5 h-12 text-base font-sans tracking-wide uppercase transition-all duration-200 focus:outline-none placeholder-slate-400 ${
-                errors.userCode
+              className={`w-full bg-white text-slate-900 rounded-xl border pl-11 pr-4 py-2.5 h-12 text-base font-sans tracking-wide uppercase transition-all duration-200 focus:outline-none placeholder-slate-400 ${errors.userCode
                   ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500/20'
                   : 'border-slate-300 focus:border-saffron-500 focus:ring-1 focus:ring-saffron-500/20 hover:border-slate-400'
-              }`}
+                }`}
             />
           </div>
           {errors.userCode && (
@@ -160,11 +157,10 @@ export default function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               {...register('password')}
               placeholder="••••••••"
-              className={`w-full bg-white text-slate-900 rounded-xl border pl-11 pr-11 py-2.5 h-12 text-base font-sans tracking-wide transition-all duration-200 focus:outline-none placeholder-slate-400 ${
-                errors.password
+              className={`w-full bg-white text-slate-900 rounded-xl border pl-11 pr-11 py-2.5 h-12 text-base font-sans tracking-wide transition-all duration-200 focus:outline-none placeholder-slate-400 ${errors.password
                   ? 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500/20'
                   : 'border-slate-300 focus:border-saffron-500 focus:ring-1 focus:ring-saffron-500/20 hover:border-slate-400'
-              }`}
+                }`}
             />
             <button
               type="button"
@@ -177,18 +173,6 @@ export default function LoginPage() {
           {errors.password && (
             <p className="text-sm text-red-500 mt-0.5">{t(errors.password.message)}</p>
           )}
-        </div>
-
-        {/* Remember Me Session */}
-        <div className="flex items-center justify-between py-1">
-          <label className="flex items-center text-sm text-slate-600 font-sans select-none cursor-pointer group">
-            <input
-              type="checkbox"
-              {...register('rememberMe')}
-              className="mr-2.5 rounded-md border-slate-300 text-saffron-500 focus:ring-saffron-500/40 focus:ring-offset-0 cursor-pointer h-4 w-4 transition-all"
-            />
-            <span className="group-hover:text-slate-900 transition-colors">{t('Remember this session')}</span>
-          </label>
         </div>
 
         {/* Submit Button */}

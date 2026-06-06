@@ -134,7 +134,7 @@ export default function ReceiveBatchModal({ isOpen, onClose, batch }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`${t('Confirm Shipment')}: ${batch.batchCode}`}
+      title={`${t('Confirm Receipt')}: ${batch.batchCode}`}
       size="xl"
     >
       {isLoading ? (
@@ -145,7 +145,7 @@ export default function ReceiveBatchModal({ isOpen, onClose, batch }) {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
         {/* Info summary */}
-        <div className="bg-gray-50 border p-3.5 rounded text-xs text-gray-600 font-sans grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-gray-50 border p-3.5 rounded text-xs text-gray-600 font-sans grid grid-cols-2 sm:grid-cols-3 gap-4">
           <div>
             <span className="font-semibold block text-gray-500">{t('Shipping Origin')}:</span>
             <span>{batch.fromDistrictName ? `${batch.fromDistrictName}, ` : ''}{batch.fromStateName}</span>
@@ -153,10 +153,6 @@ export default function ReceiveBatchModal({ isOpen, onClose, batch }) {
           <div>
             <span className="font-semibold block text-gray-500">{t('Dispatched Date')}:</span>
             <span>{batch.dispatchDate ? new Date(batch.dispatchDate).toLocaleDateString() : '—'}</span>
-          </div>
-          <div>
-            <span className="font-semibold block text-gray-500">{t('Expected Arrival')}:</span>
-            <span>{batch.expectedArrival ? new Date(batch.expectedArrival).toLocaleDateString() : '—'}</span>
           </div>
           <div>
             <span className="font-semibold block text-gray-500">{t('Total Units')}:</span>

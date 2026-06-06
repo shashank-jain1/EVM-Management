@@ -4,7 +4,7 @@ import { useTranslation } from '@/components/common/LanguageContext';
 const STATUS_STYLES = {
   // EVM Status
   IN_WAREHOUSE:       { bg: 'bg-blue-100',    text: 'text-blue-800',    dot: 'bg-blue-500',   label: 'In Warehouse' },
-  IN_TRANSIT:         { bg: 'bg-amber-100',   text: 'text-amber-800',   dot: 'bg-amber-500',  label: 'In Transit' },
+  IN_TRANSIT:         { bg: 'bg-amber-100',   text: 'text-amber-800',   dot: 'bg-amber-500',  label: 'Receiving pending' },
   DEPLOYED:           { bg: 'bg-green-100',   text: 'text-green-800',   dot: 'bg-green-500',  label: 'Deployed' },
   FAULTY:             { bg: 'bg-red-100',     text: 'text-red-800',     dot: 'bg-red-500',    label: 'Faulty' },
   DECOMMISSIONED:     { bg: 'bg-gray-100',    text: 'text-gray-600',    dot: 'bg-gray-400',   label: 'Decommissioned' },

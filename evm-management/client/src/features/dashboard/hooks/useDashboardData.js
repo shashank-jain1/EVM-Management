@@ -61,22 +61,21 @@ export function useDashboardData() {
 
   const dashboardData = dashboardQuery.data || {};
   const statusCounts = dashboardData.statusCounts || {};
-  const unitsByState = dashboardData.unitsByState || [];
+  const unitsByDistrict = dashboardData.unitsByDistrict || [];
 
   // Calculate KPIs on the fly from database counts
   const totalUnits = Object.values(statusCounts).reduce((a, b) => a + b, 0);
-  const controlUnits = unitsByState.reduce((sum, row) => sum + (row.controlUnits || 0), 0);
-  const ballotUnits = unitsByState.reduce((sum, row) => sum + (row.ballotUnits || 0), 0);
-  const vvpatUnits = unitsByState.reduce((sum, row) => sum + (row.vvpats || row.vvpaTs || 0), 0);
+  const controlUnits = unitsByDistrict.reduce((sum, row) => sum + (row.controlUnits || 0), 0);
+  const ballotUnits = unitsByDistrict.reduce((sum, row) => sum + (row.ballotUnits || 0), 0);
+  const vvpatUnits = unitsByDistrict.reduce((sum, row) => sum + (row.vvpats || row.vvpaTs || 0), 0);
 
   const kpis = {
     totalUnits,
     controlUnits,
     ballotUnits,
     vvpatUnits,
-    inTransit: statusCounts.IN_TRANSIT || 0,
-    deployed: statusCounts.DEPLOYED || 0,
-    faulty: statusCounts.FAULTY || 0,
+    sentUnits: dashboardData.sentUnits || 0,
+    receivedUnits: dashboardData.receivedUnits || 0,
   };
 
   // Format Status Counts dictionary for Donut Chart
@@ -85,9 +84,9 @@ export function useDashboardData() {
     count,
   }));
 
-  // Format State Breakdown for Bar Chart
-  const stateBreakdown = unitsByState.map((row) => ({
-    stateName: row.stateName,
+  // Format District Breakdown for Bar Chart
+  const districtBreakdown = unitsByDistrict.map((row) => ({
+    districtName: row.districtName,
     controlUnits: row.controlUnits,
     ballotUnits: row.ballotUnits,
     vvpatUnits: row.vvpats || row.vvpaTs || 0,
@@ -99,7 +98,7 @@ export function useDashboardData() {
   return {
     kpis,
     statusBreakdown,
-    stateBreakdown,
+    districtBreakdown,
     recentDispatches,
     pendingReceipts,
     isLoading,

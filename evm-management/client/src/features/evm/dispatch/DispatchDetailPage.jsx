@@ -85,7 +85,7 @@ export default function DispatchDetailPage() {
         </div>
         <h3 className="text-base font-bold text-gray-900 font-sans">{t('Batch Record Not Found')}</h3>
         <p className="text-xs text-gray-500 font-sans mt-2 max-w-sm">
-          {t('The requested dispatch batch or challan code does not exist in ECI records.')}
+          {t('The requested dispatch batch or receipt code does not exist in ECI records.')}
         </p>
         <Button onClick={() => navigate('/dashboard')} variant="secondary" className="mt-6 cursor-pointer">
           <span className="flex items-center gap-1.5"><ArrowLeft size={14} /> {t('Back to Dashboard')}</span>
@@ -199,7 +199,7 @@ export default function DispatchDetailPage() {
             variant="secondary"
             className="bg-white border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-bold shadow-sm shrink-0 cursor-pointer"
           >
-            <span className="flex items-center gap-1.5"><Printer size={14} /> {t('Print Challan')}</span>
+            <span className="flex items-center gap-1.5"><Printer size={14} /> {t('Print Receipt')}</span>
           </Button>
 
           {canCancel && (
@@ -208,7 +208,7 @@ export default function DispatchDetailPage() {
               variant="danger"
               className="text-xs font-bold shadow-sm shrink-0 cursor-pointer"
             >
-              <span className="flex items-center gap-1.5"><Trash2 size={14} /> {t('Cancel Shipment')}</span>
+              <span className="flex items-center gap-1.5"><Trash2 size={14} /> {t('Cancel Dispatch')}</span>
             </Button>
           )}
         </div>
@@ -255,12 +255,6 @@ export default function DispatchDetailPage() {
                   <Calendar size={13} className="text-gray-400 shrink-0" />
                   <span>{t('Sent')}: {batch.dispatchDate ? format(new Date(batch.dispatchDate), 'dd MMM yyyy HH:mm') : '—'}</span>
                 </div>
-                {batch.expectedArrival && (
-                  <div className="flex items-center gap-1.5 text-gray-600 font-sans">
-                    <Calendar size={13} className="text-gray-400 shrink-0" />
-                    <span>{t('Expected')}: {format(new Date(batch.expectedArrival), 'dd MMM yyyy')}</span>
-                  </div>
-                )}
                 {batch.actualArrival && (
                   <div className="flex items-center gap-1.5 text-emerald-700 font-sans">
                     <CheckCircle size={13} className="text-emerald-500 shrink-0" />
@@ -269,25 +263,16 @@ export default function DispatchDetailPage() {
                 )}
               </div>
             </div>
-
-            {batch.remarks && (
-              <div className="pt-2 border-t border-gray-100">
-                <span className="text-[10px] text-gray-400 font-sans uppercase font-semibold">{t('Custodian Remarks')}</span>
-                <p className="text-gray-700 font-sans mt-1 italic leading-normal bg-gray-50 p-2 border rounded">
-                  &ldquo;{batch.remarks}&rdquo;
-                </p>
-              </div>
-            )}
           </div>
         </div>
 
         {/* Dispatch Items list */}
         <div className="lg:col-span-2 bg-white border border-gray-200 border-t-4 border-t-navy-950 rounded-lg p-5 shadow-sm space-y-4">
           <div className="pb-2 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="text-xs font-bold font-sans text-navy-950 uppercase tracking-wide">
+            <h3 className="text-xs font-bold font-sans text-navy-955 uppercase tracking-wide">
               {t('Dispatched Device Items List')} ({batch.totalUnits} {t('unit(s)')})
             </h3>
-            <span className="text-[10px] text-gray-400 font-mono">{t('Challan Details')}</span>
+            <span className="text-[10px] text-gray-400 font-mono">{t('Receipt Details')}</span>
           </div>
 
           <Table
@@ -304,7 +289,7 @@ export default function DispatchDetailPage() {
       <Modal
         isOpen={cancelModalOpen}
         onClose={() => setCancelModalOpen(false)}
-        title={t('Cancel Shipment')}
+        title={t('Cancel Dispatch')}
         size="md"
       >
         <form onSubmit={handleCancelSubmit} className="space-y-4">
@@ -312,7 +297,7 @@ export default function DispatchDetailPage() {
             <AlertTriangle size={16} className="shrink-0 mt-0.5 text-red-500" />
             <div>
               <span className="font-bold">{t('Warning')}: </span>
-              {t('Cancelling a shipment cannot be undone. All devices in this shipment will automatically return to the sender warehouse location.')}
+              {t('Cancelling a dispatch receipt cannot be undone. All devices in this dispatch will automatically return to the sender warehouse location.')}
             </div>
           </div>
 
@@ -341,7 +326,7 @@ export default function DispatchDetailPage() {
               className="cursor-pointer"
               loading={cancelBatchMutation.isPending}
             >
-              {t('Abort & Cancel Shipping Batch')}
+              {t('Abort & Cancel Dispatch')}
             </Button>
           </div>
         </form>

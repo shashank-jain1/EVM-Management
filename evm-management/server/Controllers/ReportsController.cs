@@ -203,33 +203,134 @@ public class ReportsController : ControllerBase
     public async Task<IActionResult> Dashboard()
     {
         using var conn = _db.CreateConnection();
-        var statusCounts = await _evmRepo.GetStatusCountsAsync();
+        
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        var userStateId = User.FindFirst("stateId") is { } s ? int.Parse(s.Value) : (int?)null;
+        var userDistrictId = User.FindFirst("districtId") is { } d ? int.Parse(d.Value) : (int?)null;
 
-        var recentDispatches = await conn.QueryAsync(
-            @"SELECT TOP 10 b.batch_id AS batchId, b.batch_code AS batchCode, b.dispatch_date AS dispatchDate,
-                     b.dispatch_status AS dispatchStatus, b.total_units AS totalUnits,
-                     fs.state_name AS fromStateName, ts.state_name AS toStateName
+        // --- Status Counts (filtered) ---
+        var statusConditions = new List<string> { "is_active = 1" };
+        var statusParams = new DynamicParameters();
+        if (role == "DISTRICT_OFFICER")
+        {
+            statusConditions.Add("current_state_id = @StateId");
+            statusConditions.Add("current_district_id = @DistrictId");
+            statusParams.Add("StateId", userStateId);
+            statusParams.Add("DistrictId", userDistrictId);
+        }
+        else if (role == "STATE_OFFICER")
+        {
+            statusConditions.Add("current_state_id = @StateId");
+            statusParams.Add("StateId", userStateId);
+        }
+        var statusWhere = string.Join(" AND ", statusConditions);
+        var statusRows = await conn.QueryAsync(
+            $"SELECT current_status AS Status, COUNT(*) AS Cnt FROM evm_units WHERE {statusWhere} GROUP BY current_status",
+            statusParams);
+        var statusCounts = statusRows.ToDictionary(r => (string)r.Status, r => (int)r.Cnt);
+
+        // --- Recent Dispatches (filtered) ---
+        var recentConditions = new List<string> { "1=1" };
+        var recentParams = new DynamicParameters();
+        if (role == "DISTRICT_OFFICER")
+        {
+            recentConditions.Add("(b.from_state_id = @StateId OR b.to_state_id = @StateId)");
+            recentConditions.Add("(b.from_district_id = @DistrictId OR b.to_district_id = @DistrictId OR b.from_district_id IS NULL OR b.to_district_id IS NULL)");
+            recentParams.Add("StateId", userStateId);
+            recentParams.Add("DistrictId", userDistrictId);
+        }
+        else if (role == "STATE_OFFICER")
+        {
+            recentConditions.Add("(b.from_state_id = @StateId OR b.to_state_id = @StateId)");
+            recentParams.Add("StateId", userStateId);
+        }
+        var recentWhere = string.Join(" AND ", recentConditions);
+        var recentDispatches = await conn.QueryAsync<DashboardRecentDispatchDto>(
+            $@"SELECT TOP 10 b.batch_id AS BatchId, b.batch_code AS BatchCode, b.dispatch_date AS DispatchDate,
+                     b.dispatch_status AS DispatchStatus, b.total_units AS TotalUnits,
+                     fs.state_name AS FromStateName, ts.state_name AS ToStateName
               FROM dispatch_batches b
               JOIN states fs ON b.from_state_id = fs.state_id
               JOIN states ts ON b.to_state_id = ts.state_id
-              ORDER BY b.dispatch_date DESC");
+              WHERE {recentWhere}
+              ORDER BY b.dispatch_date DESC", recentParams);
 
-        var unitsByState = await conn.QueryAsync(
-            @"SELECT s.state_name AS stateName, COUNT(*) AS totalUnits,
-                     SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS controlUnits,
-                     SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS ballotUnits,
-                     SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS vvpats
+        // --- District Breakdown (filtered) ---
+        var districtConditions = new List<string> { "e.is_active = 1" };
+        var districtParams = new DynamicParameters();
+        if (role == "DISTRICT_OFFICER")
+        {
+            districtConditions.Add("e.current_state_id = @StateId");
+            districtConditions.Add("e.current_district_id = @DistrictId");
+            districtParams.Add("StateId", userStateId);
+            districtParams.Add("DistrictId", userDistrictId);
+        }
+        else if (role == "STATE_OFFICER")
+        {
+            districtConditions.Add("e.current_state_id = @StateId");
+            districtParams.Add("StateId", userStateId);
+        }
+        var districtWhere = string.Join(" AND ", districtConditions);
+        
+        var unitsByDistrict = await conn.QueryAsync<DashboardDistrictAllocationDto>(
+            $@"SELECT COALESCE(d.district_name, 'State Headquarters') AS DistrictName, COUNT(*) AS TotalUnits,
+                     SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS ControlUnits,
+                     SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS BallotUnits,
+                     SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS Vvpats
               FROM evm_units e
-              LEFT JOIN states s ON e.current_state_id = s.state_id
-              WHERE e.is_active = 1
-              GROUP BY s.state_name
-              ORDER BY totalUnits DESC");
+              LEFT JOIN districts d ON e.current_district_id = d.district_id
+              WHERE {districtWhere}
+              GROUP BY d.district_name
+              ORDER BY TotalUnits DESC", districtParams);
 
-        return Ok(ApiResponse<object>.Ok(new
+        // --- Sent Units (filtered) ---
+        var sentConditions = new List<string> { "dispatch_status <> 'CANCELLED'" };
+        var sentParams = new DynamicParameters();
+        if (role == "DISTRICT_OFFICER")
+        {
+            sentConditions.Add("from_state_id = @StateId");
+            sentConditions.Add("from_district_id = @DistrictId");
+            sentParams.Add("StateId", userStateId);
+            sentParams.Add("DistrictId", userDistrictId);
+        }
+        else if (role == "STATE_OFFICER")
+        {
+            sentConditions.Add("from_state_id = @StateId");
+            sentParams.Add("StateId", userStateId);
+        }
+        var sentWhere = string.Join(" AND ", sentConditions);
+        var sentUnits = await conn.ExecuteScalarAsync<int>(
+            $"SELECT ISNULL(SUM(total_units), 0) FROM dispatch_batches WHERE {sentWhere}", sentParams);
+
+        // --- Received Units (filtered) ---
+        var recConditions = new List<string> { "di.item_status = 'RECEIVED'" };
+        var recParams = new DynamicParameters();
+        if (role == "DISTRICT_OFFICER")
+        {
+            recConditions.Add("db.to_state_id = @StateId");
+            recConditions.Add("db.to_district_id = @DistrictId");
+            recParams.Add("StateId", userStateId);
+            recParams.Add("DistrictId", userDistrictId);
+        }
+        else if (role == "STATE_OFFICER")
+        {
+            recConditions.Add("db.to_state_id = @StateId");
+            recParams.Add("StateId", userStateId);
+        }
+        var recWhere = string.Join(" AND ", recConditions);
+        var receivedUnits = await conn.ExecuteScalarAsync<int>(
+            $@"SELECT COUNT(1) 
+               FROM dispatch_items di
+               JOIN dispatch_batches db ON di.batch_id = db.batch_id
+               WHERE {recWhere}", recParams);
+
+        return Ok(ApiResponse<object>.Ok(new DashboardReportDto
         {
             StatusCounts = statusCounts,
             RecentDispatches = recentDispatches,
-            UnitsByState = unitsByState,
+            UnitsByDistrict = unitsByDistrict,
+            SentUnits = sentUnits,
+            ReceivedUnits = receivedUnits
         }));
     }
 
@@ -298,4 +399,33 @@ public class ReportsController : ControllerBase
             new { StateId = stateId });
         return Ok(ApiResponse<object>.Ok(districts));
     }
+}
+
+public class DashboardReportDto
+{
+    public Dictionary<string, int> StatusCounts { get; set; } = new();
+    public IEnumerable<DashboardRecentDispatchDto> RecentDispatches { get; set; } = new List<DashboardRecentDispatchDto>();
+    public IEnumerable<DashboardDistrictAllocationDto> UnitsByDistrict { get; set; } = new List<DashboardDistrictAllocationDto>();
+    public int SentUnits { get; set; }
+    public int ReceivedUnits { get; set; }
+}
+
+public class DashboardRecentDispatchDto
+{
+    public int BatchId { get; set; }
+    public string BatchCode { get; set; } = string.Empty;
+    public DateTime DispatchDate { get; set; }
+    public string DispatchStatus { get; set; } = string.Empty;
+    public int TotalUnits { get; set; }
+    public string FromStateName { get; set; } = string.Empty;
+    public string ToStateName { get; set; } = string.Empty;
+}
+
+public class DashboardDistrictAllocationDto
+{
+    public string DistrictName { get; set; } = string.Empty;
+    public int TotalUnits { get; set; }
+    public int ControlUnits { get; set; }
+    public int BallotUnits { get; set; }
+    public int Vvpats { get; set; }
 }

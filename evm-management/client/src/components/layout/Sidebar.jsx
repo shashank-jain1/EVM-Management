@@ -10,7 +10,6 @@ import {
   Users,
   BarChart3,
   Search,
-  FileCode,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -31,12 +30,11 @@ export default function Sidebar({ collapsed, setCollapsed, onItemClick }) {
   const menuItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'STATE_OFFICER', 'DISTRICT_OFFICER'] },
     { path: '/evm', label: 'EVM Inventory', icon: Cpu, roles: ['ADMIN', 'STATE_OFFICER', 'DISTRICT_OFFICER'] },
-    { path: '/dispatch', label: 'Dispatch (Send)', icon: Truck, roles: ['ADMIN', 'STATE_OFFICER', 'DISTRICT_OFFICER'] },
-    { path: '/receive', label: 'Receive Units', icon: Download, roles: ['ADMIN', 'STATE_OFFICER', 'DISTRICT_OFFICER'] },
+    { path: '/dispatch', label: 'Send EVM', icon: Truck, roles: ['ADMIN', 'STATE_OFFICER', 'DISTRICT_OFFICER'] },
+    { path: '/receive', label: 'Receive EVM', icon: Download, roles: ['ADMIN', 'STATE_OFFICER', 'DISTRICT_OFFICER'] },
     { path: '/users', label: 'User Control', icon: Users, roles: ['ADMIN'] },
     { path: '/reports', label: 'Reports & Analytics', icon: BarChart3, roles: ['ADMIN', 'STATE_OFFICER'] },
     { path: '/search', label: 'Global Search', icon: Search, roles: ['ADMIN', 'STATE_OFFICER', 'DISTRICT_OFFICER'] },
-    { path: '/audit', label: 'Activity Logs', icon: FileCode, roles: ['ADMIN'] },
   ];
 
   const allowedItems = menuItems.filter(item => item.roles.includes(user?.role || ''));

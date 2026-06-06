@@ -16,8 +16,6 @@ export function useDispatch() {
   const [scannedUnits, setScannedUnits] = useState([]);
   const [toStateId, setToStateId] = useState('');
   const [toDistrictId, setToDistrictId] = useState('');
-  const [expectedArrival, setExpectedArrival] = useState('');
-  const [remarks, setRemarks] = useState('');
   const [createdBatch, setCreatedBatch] = useState(null);
   const [unregisteredCode, setUnregisteredCode] = useState(null);
 
@@ -52,7 +50,7 @@ export function useDispatch() {
 
       // Business Rule: Cannot dispatch units currently in transit
       if (unit.currentStatus === 'IN_TRANSIT') {
-        addToast(`Unit ${code} is already in transit.`, 'error');
+        addToast(t("Unit is already receiving pending."), 'error');
         return;
       }
       
@@ -88,8 +86,6 @@ export function useDispatch() {
     setStep(1);
     setToStateId('');
     setToDistrictId('');
-    setExpectedArrival('');
-    setRemarks('');
     setCreatedBatch(null);
   };
 
@@ -118,8 +114,8 @@ export function useDispatch() {
     const payload = {
       toStateId: parseInt(toStateId),
       toDistrictId: toDistrictId ? parseInt(toDistrictId) : null,
-      expectedArrival: expectedArrival ? new Date(expectedArrival).toISOString() : null,
-      remarks,
+      expectedArrival: null,
+      remarks: null,
       unitCodes: scannedUnits.map((u) => u.unitCode),
     };
 
@@ -136,10 +132,6 @@ export function useDispatch() {
     setToStateId,
     toDistrictId,
     setToDistrictId,
-    expectedArrival,
-    setExpectedArrival,
-    remarks,
-    setRemarks,
     createdBatch,
     clearStaged,
     submitDispatch,

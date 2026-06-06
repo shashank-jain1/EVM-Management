@@ -227,8 +227,7 @@ export default function ReportsPage() {
       { header: t('Destination'), accessor: 'toStateName', render: (val, row) => `${row.toDistrictName ? `${row.toDistrictName}, ` : ''}${val}` },
       { header: t('Units Quant'), accessor: 'totalUnits', render: (val) => <span className="font-mono font-semibold">{val}</span> },
       { header: t('Date Dispatched'), accessor: 'dispatchDate', render: (val) => val ? format(new Date(val), 'dd MMM yyyy') : '—' },
-      { header: t('Expected Arrival'), accessor: 'expectedArrival', render: (val) => val ? format(new Date(val), 'dd MMM yyyy') : '—' },
-      { header: t('Actual Arrival'), accessor: 'actualArrival', render: (val) => val ? format(new Date(val), 'dd MMM yyyy') : t('In Transit') },
+      { header: t('Actual Arrival'), accessor: 'actualArrival', render: (val) => val ? format(new Date(val), 'dd MMM yyyy') : t('Receiving pending') },
       { header: t('Status'), accessor: 'dispatchStatus', render: (val) => <Badge status={val} /> },
     ];
 

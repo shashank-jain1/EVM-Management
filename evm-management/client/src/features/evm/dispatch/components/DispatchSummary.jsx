@@ -1,14 +1,12 @@
-import React from 'react';
-import { format } from 'date-fns';
-import { Truck, MapPin, Calendar, FileText } from 'lucide-react';
+import { Truck } from 'lucide-react';
 import { useTranslation } from '@/components/common/LanguageContext';
 
-export default function DispatchSummary({ fromLocation, toLocation, expectedArrival, remarks, unitCounts }) {
+export default function DispatchSummary({ fromLocation, toLocation, unitCounts }) {
   const { t } = useTranslation();
   const totalCounts = unitCounts.CONTROL_UNIT + unitCounts.BALLOT_UNIT + unitCounts.VVPAT;
 
   return (
-    <div className="bg-white border border-gray-200 border-t-4 border-t-navy-950 rounded-lg p-5 shadow-sm space-y-5">
+    <div className="bg-white border border-gray-200 border-t-4 border-t-navy-955 rounded-lg p-5 shadow-sm space-y-5">
       <div className="pb-2 border-b border-gray-150 flex items-center gap-2">
         <Truck size={18} className="text-saffron-500" />
         <h4 className="text-xs font-bold text-navy-950 font-sans uppercase tracking-wide">
@@ -37,30 +35,6 @@ export default function DispatchSummary({ fromLocation, toLocation, expectedArri
             </p>
           </div>
         </div>
-
-        {/* Date details */}
-        <div className="flex gap-2.5 items-start bg-gray-50 border p-3 rounded">
-          <Calendar size={15} className="text-gray-400 mt-0.5 shrink-0" />
-          <div>
-            <span className="text-[10px] text-gray-400 font-sans uppercase font-bold block">{t('Expected Arrival')}</span>
-            <p className="font-semibold text-gray-800 font-sans mt-0.5">
-              {expectedArrival ? format(new Date(expectedArrival), 'dd MMM yyyy') : t('No arrival date specified')}
-            </p>
-          </div>
-        </div>
-
-        {/* Remarks */}
-        {remarks && (
-          <div className="flex gap-2.5 items-start bg-gray-50 border p-3 rounded">
-            <FileText size={15} className="text-gray-400 mt-0.5 shrink-0" />
-            <div>
-              <span className="text-[10px] text-gray-400 font-sans uppercase font-bold block">{t('Officer Remarks')}</span>
-              <p className="text-gray-700 font-sans mt-0.5 italic">
-                &ldquo;{remarks}&rdquo;
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Units breakdown */}
         <div className="pt-3 border-t border-gray-150">

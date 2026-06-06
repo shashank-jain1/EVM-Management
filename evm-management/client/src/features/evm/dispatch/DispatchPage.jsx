@@ -139,7 +139,7 @@ export default function DispatchPage() {
           <span className="text-gray-300">&rarr;</span>
           <span className={`px-2 py-0.5 rounded font-semibold ${step === 2 ? 'bg-saffron-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{t('2. Destination')}</span>
           <span className="text-gray-300">&rarr;</span>
-          <span className={`px-2 py-0.5 rounded font-semibold ${step === 3 ? 'bg-saffron-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{t('3. Gate Pass')}</span>
+          <span className={`px-2 py-0.5 rounded font-semibold ${step === 3 ? 'bg-saffron-500 text-white' : 'bg-gray-100 text-gray-500'}`}>{t('3. Receipt')}</span>
         </div>
       </div>
 
@@ -164,7 +164,7 @@ export default function DispatchPage() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-gray-100">
+            <div className="pt-4 border-t border-gray-150">
               <h3 className="text-xs font-bold font-sans text-navy-955 uppercase tracking-wide pb-2 border-b border-gray-100 flex items-center gap-2">
                 <Keyboard size={14} className="text-gray-400" />
                 {t('Type Unit Code')}
@@ -282,24 +282,6 @@ export default function DispatchPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label={t('Expected Arrival Date')}
-                type="date"
-                value={expectedArrival}
-                onChange={(e) => setExpectedArrival(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-              />
-
-              <Input
-                label={t('Shipping Notes')}
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-                placeholder={t('E.g. Vehicle number, remarks...')}
-                maxLength={500}
-              />
-            </div>
-
             <div className="pt-5 border-t border-gray-100 mt-6 flex justify-between">
               <Button onClick={() => setStep(1)} variant="secondary" className="cursor-pointer text-xs font-bold">
                 <span className="flex items-center gap-1.5"><ArrowLeft size={14} /> {t('Back to Scanner')}</span>
@@ -311,7 +293,7 @@ export default function DispatchPage() {
                 loading={isSubmitting}
                 className="cursor-pointer text-xs font-bold shadow-md shadow-saffron-500/10"
               >
-                <span className="flex items-center gap-1.5">{t('Confirm & Create Challan')}</span>
+                <span className="flex items-center gap-1.5">{t('Confirm & Create Receipt')}</span>
               </Button>
             </div>
           </div>
@@ -321,8 +303,6 @@ export default function DispatchPage() {
             <DispatchSummary
               fromLocation={{ stateName: user.stateName || 'Central', districtName: user.districtName }}
               toLocation={getToLocationName()}
-              expectedArrival={expectedArrival}
-              remarks={remarks}
               unitCounts={unitCounts}
             />
           </div>
@@ -345,7 +325,7 @@ export default function DispatchPage() {
                   {t('EVM Batch Sent Successfully!')}
                 </h4>
                 <p className="text-xs text-emerald-700 font-sans mt-0.5">
-                  {t('Batch code')} <span className="font-mono font-bold text-navy-950 text-[11px] bg-white border border-emerald-250 px-1 py-0.5 rounded">{createdBatch.batchCode}</span> {t('has been written. Print and sign the challan before shipping.')}
+                  {t('Batch code')} <span className="font-mono font-bold text-navy-955 text-[11px] bg-white border border-emerald-250 px-1 py-0.5 rounded">{createdBatch.batchCode}</span> {t('has been written. Print and sign the receipt before shipping.')}
                 </p>
               </div>
             </div>
@@ -357,7 +337,7 @@ export default function DispatchPage() {
                 className="shadow-sm shrink-0 cursor-pointer text-xs font-bold"
               >
                 <span className="flex items-center gap-1.5 justify-center">
-                  <Printer size={14} /> {t('Print Gate Pass')}
+                  <Printer size={14} /> {t('Print Receipt')}
                 </span>
               </Button>
               
@@ -376,7 +356,7 @@ export default function DispatchPage() {
           {/* Challan Preview Frame */}
           <div className="bg-white border border-gray-250 border-t-4 border-t-navy-950 rounded-lg shadow-sm p-4 relative overflow-auto max-h-[70vh]">
             <div className="absolute top-2 left-2 text-[9px] font-mono text-gray-400 uppercase tracking-widest pointer-events-none select-none bg-gray-50 border px-1.5 py-0.5 rounded">
-              {t('Gate Pass Preview')}
+              {t('Receipt Preview')}
             </div>
             
             {/* Challan printable component */}

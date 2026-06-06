@@ -108,7 +108,7 @@ export default function EVMListPage() {
 
   const statusOptions = [
     { label: t('In Warehouse'), value: 'IN_WAREHOUSE' },
-    { label: t('In Transit'), value: 'IN_TRANSIT' },
+    { label: t('Receiving pending'), value: 'IN_TRANSIT' },
     { label: t('Deployed (Booths)'), value: 'DEPLOYED' },
     { label: t('Faulty'), value: 'FAULTY' },
     { label: t('Returned'), value: 'RETURNED' },

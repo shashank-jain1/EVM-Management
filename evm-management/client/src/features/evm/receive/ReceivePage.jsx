@@ -113,22 +113,11 @@ export default function ReceivePage() {
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400">{t('Expected Arrival')}:</span>
-                      <span className="text-gray-700 font-semibold">{expectedStr}</span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
                       <span className="text-gray-400">{t('Total Units')}:</span>
                       <span className="font-mono font-bold text-navy-950 bg-gray-50 border px-1.5 py-0.5 rounded text-[10px]">
                         {batch.totalUnits} {t('Units')}
                       </span>
                     </div>
-
-                    {batch.remarks && (
-                      <div className="pt-2 mt-2 border-t border-gray-50 text-gray-500 italic">
-                        &ldquo;{batch.remarks}&rdquo;
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -147,7 +136,7 @@ export default function ReceivePage() {
                     onClick={() => navigate(`/dispatch/${batch.batchId}`)}
                     variant="secondary"
                     className="bg-white border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-bold cursor-pointer h-9 px-3 shrink-0"
-                    title={t('View Challan')}
+                    title={t('View Receipt')}
                   >
                     {t('Details')}
                   </Button>

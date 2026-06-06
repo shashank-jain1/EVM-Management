@@ -14,10 +14,10 @@ import { useTranslation } from '@/components/common/LanguageContext';
 export default function InventoryChart({ data }) {
   const { t } = useTranslation();
 
-  // Format data for Recharts: expect objects like { stateName, controlUnits, ballotUnits, vvpatUnits }
+  // Format data for Recharts: expect objects like { districtName, controlUnits, ballotUnits, vvpatUnits }
   // Map or clean the keys to user-friendly titles
   const chartData = data.map((item) => ({
-    name: item.stateName || 'Unknown',
+    name: item.districtName || 'Unknown',
     [t('Control Units')]: item.controlUnits || 0,
     [t('Ballot Units')]: item.ballotUnits || 0,
     [t('VVPATs')]: item.vvpatUnits || 0,
@@ -26,13 +26,13 @@ export default function InventoryChart({ data }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
       <h3 className="text-sm font-bold font-sans text-navy-900 uppercase tracking-wide mb-5 pb-2 border-b border-gray-100">
-        {t('EVM Allocation by State')}
+        {t('EVM Allocation by District')}
       </h3>
 
       <div className="h-72 w-full">
         {chartData.length === 0 ? (
           <div className="h-full flex items-center justify-center text-xs text-gray-400 font-sans">
-            {t('No state allocation data available.')}
+            {t('No district allocation data available.')}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">

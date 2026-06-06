@@ -8,7 +8,7 @@ import InventoryChart from './components/InventoryChart';
 import StatusDonut from './components/StatusDonut';
 import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
-import { Cpu, Truck, Download, ShieldAlert, PlusCircle, BarChart3, RefreshCw } from 'lucide-react';
+import { Cpu, Truck, Download, ShieldAlert, PlusCircle, BarChart3, RefreshCw, Search } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useTranslation } from '@/components/common/LanguageContext';
 
@@ -19,7 +19,7 @@ export default function DashboardPage() {
   const {
     kpis,
     statusBreakdown,
-    stateBreakdown,
+    districtBreakdown,
     recentDispatches,
     pendingReceipts,
     isLoading,
@@ -70,12 +70,6 @@ export default function DashboardPage() {
             {t("Logged in as")} <span className="font-semibold text-gray-700">{user?.fullName}</span>
           </p>
         </div>
-        <button
-          onClick={refetchAll}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-500 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded transition-colors cursor-pointer"
-        >
-          <RefreshCw size={12} /> {t("Sync Data")}
-        </button>
       </div>
 
       {/* Pending Receipts Alert for state/district officers */}
@@ -84,106 +78,58 @@ export default function DashboardPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <KPICard
-          title={t("Total EVM Units")}
+          title={t("Total EVMs")}
           value={kpis.totalUnits}
           detail={`${t("CU")}: ${kpis.controlUnits} | ${t("BU")}: ${kpis.ballotUnits} | ${t("VVPAT")}: ${kpis.vvpatUnits}`}
           icon={Cpu}
           className="border-t-4 border-t-blue-500"
         />
         <KPICard
-          title={t("In Transit")}
-          value={kpis.inTransit}
-          detail={t("Currently moving between locations")}
+          title={t("Sent EVMs")}
+          value={kpis.sentUnits}
+          detail={t("Total units sent across locations")}
           icon={Truck}
-          trend={kpis.inTransit > 0 ? `${kpis.inTransit} ${t("moving")}` : t("No movements")}
-          trendType={kpis.inTransit > 0 ? 'down' : 'neutral'}
           className="border-t-4 border-t-saffron-500"
         />
         <KPICard
-          title={t("Deployed Units")}
-          value={kpis.deployed}
-          detail={t("Installed at active polling booths")}
-          icon={BarChart3}
-          trend={t("Active booths")}
-          trendType="up"
+          title={t("Received EVMs")}
+          value={kpis.receivedUnits}
+          detail={t("Total units successfully received")}
+          icon={Download}
           className="border-t-4 border-t-emerald-500"
         />
-        <KPICard
-          title={t("Faulty / Repair")}
-          value={kpis.faulty}
-          detail={t("Reported damaged/faulty units")}
-          icon={ShieldAlert}
-          trend={kpis.faulty > 0 ? `${kpis.faulty} ${t("flagged")}` : t("0 flagged")}
-          trendType={kpis.faulty > 0 ? 'down' : 'up'}
-          className="border-t-4 border-t-red-500"
-        />
-      </div>
-
-      {/* Quick Action Operations */}
-      <div className="bg-white border border-gray-200 border-t-4 border-t-saffron-500 rounded-lg p-5 shadow-sm">
-        <h3 className="text-xs font-bold font-sans text-navy-955 uppercase tracking-wide mb-4 pb-1.5 border-b border-gray-100">
-          {t("EVM Operations")}
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 bg-gray-50/50 border border-gray-200 hover:border-saffron-300 rounded flex flex-col justify-between transition-all group">
-            <div>
-              <h4 className="text-xs font-bold text-navy-950 font-sans">{t("Send EVM Batch")}</h4>
-              <p className="text-[11px] text-gray-500 font-sans mt-1">
-                {t("Send EVM units to another state or district warehouse.")}
-              </p>
-            </div>
-            <Button
-              onClick={() => navigate('/dispatch')}
-              variant="primary"
-              className="mt-4 w-full h-8 text-xs font-bold shadow-sm cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5 justify-center">
-                <PlusCircle size={14} /> {t("Send Batch")}
+        <div
+          onClick={() => navigate('/search')}
+          className="bg-white/80 backdrop-blur-md border border-slate-200/50 rounded-2xl p-3.5 md:p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-purple-500/20 transition-all duration-300 relative group overflow-hidden select-none cursor-pointer border-t-4 border-t-purple-500"
+        >
+          <div className="absolute top-0 inset-x-0 h-[3px] bg-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+          <div className="flex justify-between items-start">
+            <div className="min-w-0">
+              <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider font-sans block truncate">
+                {t("Global Search")}
               </span>
-            </Button>
+              <h3 className="text-[13px] md:text-base font-bold text-purple-600 mt-1 md:mt-2.5 leading-tight">
+                {t("Search database")}
+              </h3>
+            </div>
+            <div className="p-2 md:p-2.5 rounded-xl bg-purple-50 border border-purple-100/50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 transition-all duration-300 shrink-0">
+              <Search size={18} className="stroke-[1.5] md:w-5 md:h-5" />
+            </div>
           </div>
-
-          <div className="p-4 bg-gray-50/50 border border-gray-200 hover:border-blue-300 rounded flex flex-col justify-between transition-all group">
-            <div>
-              <h4 className="text-xs font-bold text-navy-955 font-sans">{t("Receive Units")}</h4>
-              <p className="text-[11px] text-gray-500 font-sans mt-1">
-                {t("Scan and register EVM units sent to your location. Check conditions on arrival.")}
-              </p>
-            </div>
-            <Button
-              onClick={() => navigate('/receive')}
-              variant="secondary"
-              className="mt-4 w-full h-8 text-xs font-bold text-navy-900 border-navy-300 hover:bg-navy-50 cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5 justify-center">
-                <Download size={14} /> {t("Receive Units")}
-              </span>
-            </Button>
-          </div>
-
-          <div className="p-4 bg-gray-50/50 border border-gray-200 hover:border-gray-400 rounded flex flex-col justify-between transition-all group">
-            <div>
-              <h4 className="text-xs font-bold text-navy-955 font-sans">{t("EVM Inventory")}</h4>
-              <p className="text-[11px] text-gray-500 font-sans mt-1">
-                {t("View charts, search barcodes/QR codes, and view unit history.")}
-              </p>
-            </div>
-            <Button
-              onClick={() => navigate('/evm')}
-              variant="secondary"
-              className="mt-4 w-full h-8 text-xs font-bold text-gray-700 border-gray-300 hover:bg-gray-100 cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5 justify-center">
-                <Cpu size={14} /> {t("View Inventory")}
-              </span>
-            </Button>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-3 md:mt-4 pt-2.5 md:pt-3 border-t border-slate-200/50 text-[10px] md:text-xs gap-1">
+            <span className="text-slate-450 font-sans truncate pr-2">
+              {t("Search barcode, serial, or batch")}
+            </span>
+            <span className="font-bold font-sans shrink-0 px-1.5 py-0.5 rounded-md text-[9px] md:text-[10px] self-start sm:self-auto uppercase tracking-wide bg-purple-50 text-purple-700 border border-purple-200">
+              {t("Search")}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Recharts Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <InventoryChart data={stateBreakdown} />
+        <InventoryChart data={districtBreakdown} />
         <StatusDonut data={statusBreakdown} />
       </div>
 

@@ -49,8 +49,8 @@ export default function AppRoutes() {
             <Route element={<AdminLayout />}>
               <Route path="/dashboard"        element={<DashboardPage />} />
               <Route path="/evm"              element={<EVMListPage />} />
-              <Route path="/evm/:id"          element={<EVMDetailPage />} />
               <Route path="/evm/register"     element={<ProtectedRoute roles={['ADMIN', 'STATE_OFFICER', 'DISTRICT_OFFICER']}><EVMRegisterPage /></ProtectedRoute>} />
+              <Route path="/evm/:id"          element={<EVMDetailPage />} />
               <Route path="/dispatch"         element={<DispatchPage />} />
               <Route path="/dispatch/:id"     element={<DispatchDetailPage />} />
               <Route path="/receive"          element={<ReceivePage />} />

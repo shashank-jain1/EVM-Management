@@ -25,7 +25,7 @@ export default function PendingReceipts({ receipts }) {
               {t('Pending Incoming Shipments')} ({receipts.length})
             </h4>
             <p className="text-xs text-amber-800 font-sans mt-0.5 max-w-xl">
-              {t('There are')} {receipts.length} {t('batch(es) of EVM units currently in transit destined for your district or state. Review and process their receipt immediately upon physical arrival.')}
+              {t('There are')} {receipts.length} {t('batch(es) of EVM units currently receiving pending destined for your district or state. Review and process their receipt immediately upon physical arrival.')}
             </p>
           </div>
         </div>

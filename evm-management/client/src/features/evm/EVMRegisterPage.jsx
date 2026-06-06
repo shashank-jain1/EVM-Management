@@ -25,7 +25,6 @@ const evmSchema = zod.object({
   unitType: zod.enum(['CONTROL_UNIT', 'BALLOT_UNIT', 'VVPAT'], {
     errorMap: () => ({ message: 'Please select a valid unit type' }),
   }),
-  currentLocationDescription: zod.string().max(255, 'Location details must be under 255 characters').optional(),
   boxNum: zod.string().min(1, 'Box is required'),
 });
 
@@ -35,7 +34,8 @@ export default function EVMRegisterPage() {
   const { addToast } = useToast();
   const { user } = useAuthStore();
   const { t } = useTranslation();
-  const [isScanModalOpen, setIsScanModalOpen] = useState(false);
+  const [hasScanned, setHasScanned] = useState(false);
+  const [manualCode, setManualCode] = useState('');
 
   // Fetch count of cataloged items to assign box
   const evmListQuery = useQuery({
@@ -60,7 +60,6 @@ export default function EVMRegisterPage() {
     defaultValues: {
       unitCode: '',
       unitType: 'CONTROL_UNIT',
-      currentLocationDescription: 'Main Storage Warehouse',
       boxNum: 'Box 1',
     },
   });
@@ -86,10 +85,6 @@ export default function EVMRegisterPage() {
   });
 
   const onSubmit = (data) => {
-    const finalLocation = data.currentLocationDescription
-      ? `${data.currentLocationDescription} - ${data.boxNum}`
-      : data.boxNum;
-
     const payload = {
       unitCode: data.unitCode,
       unitType: data.unitType,
@@ -98,7 +93,7 @@ export default function EVMRegisterPage() {
       serialNumber: data.unitCode,
       stateId: user?.stateId || 1,
       districtId: user?.districtId || null,
-      locationDescription: finalLocation,
+      locationDescription: data.boxNum,
     };
 
     registerMutation.mutate(payload);
@@ -110,6 +105,78 @@ export default function EVMRegisterPage() {
     { label: t('VVPAT'), value: 'VVPAT' },
   ];
 
+  if (!hasScanned) {
+    return (
+      <div className="space-y-6 max-w-md mx-auto">
+        {/* Header bar */}
+        <div className="flex justify-between items-center bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/evm')}
+              className="p-1 h-8 w-8 hover:bg-gray-100 flex items-center justify-center cursor-pointer shrink-0 border border-gray-200 rounded-md bg-transparent text-navy-700 transition-colors"
+            >
+              <ArrowLeft size={16} />
+            </button>
+            <div>
+              <h2 className="text-base font-bold font-sans text-navy-900 leading-tight">
+                {t('Register New EVM')}
+              </h2>
+              <p className="text-xs text-gray-500 font-sans mt-0.5">
+                {t('Scan the EVM barcode/QR code to start registration.')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Scanner Container */}
+        <div className="bg-white border border-gray-200 border-t-4 border-t-saffron-500 rounded-lg p-5 shadow-sm space-y-5">
+          <div className="space-y-4 py-2">
+            <p className="text-xs text-gray-500 text-center font-sans">
+              {t('Align the EVM unit barcode or QR code sticker inside the scanner frame below.')}
+            </p>
+            <div className="max-w-md mx-auto overflow-hidden rounded-lg border border-gray-200 shadow-inner">
+              <QRScanner
+                onScanSuccess={(code) => {
+                  setValue('unitCode', code.toUpperCase(), { shouldValidate: true });
+                  setHasScanned(true);
+                  addToast(`${t('Successfully scanned unit code')}: ${code}`, 'success');
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-gray-100 text-center">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">{t('Or Enter Manually')}</p>
+            <div className="flex gap-2 max-w-md mx-auto">
+              <Input
+                placeholder={t('Enter Unit Code (e.g. CU-192A)...')}
+                value={manualCode}
+                onChange={(e) => setManualCode(e.target.value)}
+                className="font-mono text-xs uppercase flex-1 h-9"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  if (manualCode.trim().length >= 5) {
+                    setValue('unitCode', manualCode.trim().toUpperCase(), { shouldValidate: true });
+                    setHasScanned(true);
+                  } else {
+                    addToast(t('Unit Code must be at least 5 characters'), 'warning');
+                  }
+                }}
+                className="h-9 font-bold px-3 shrink-0 cursor-pointer text-xs"
+              >
+                {t('Continue')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       {/* Header bar */}
@@ -117,8 +184,9 @@ export default function EVMRegisterPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate('/evm')}
+            onClick={() => setHasScanned(false)}
             className="p-1 h-8 w-8 hover:bg-gray-100 flex items-center justify-center cursor-pointer shrink-0 border border-gray-200 rounded-md bg-transparent text-navy-700 transition-colors"
+            title={t('Rescan')}
           >
             <ArrowLeft size={16} />
           </button>
@@ -151,17 +219,6 @@ export default function EVMRegisterPage() {
               error={errors.unitCode?.message}
               helperText={t('Unique barcode/QR text scanned from physical device labels.')}
               className="font-mono text-sm"
-              inputClassName="pr-10"
-              rightIcon={
-                <button
-                  type="button"
-                  onClick={() => setIsScanModalOpen(true)}
-                  className="text-gray-400 hover:text-saffron-500 hover:scale-110 active:scale-95 transition-all duration-150 cursor-pointer"
-                  title={t('Scan using camera')}
-                >
-                  <Camera size={16} />
-                </button>
-              }
               required
             />
 
@@ -188,23 +245,16 @@ export default function EVMRegisterPage() {
               isLoading={evmListQuery.isLoading}
               required
             />
-
-            <Input
-              label={t('Initial Warehouse / Storage Details')}
-              {...register('currentLocationDescription')}
-              error={errors.currentLocationDescription?.message}
-              helperText={t('E.g. Room A, Shelf 2 or North District Strongroom')}
-            />
           </div>
 
           <div className="flex justify-end gap-3 pt-5 border-t border-gray-100">
             <Button
               type="button"
               variant="secondary"
-              onClick={() => navigate('/evm')}
+              onClick={() => setHasScanned(false)}
               className="cursor-pointer"
             >
-              {t('Cancel')}
+              {t('Rescan')}
             </Button>
             <Button
               type="submit"
@@ -219,26 +269,6 @@ export default function EVMRegisterPage() {
           </div>
         </form>
       </div>
-
-      <Modal
-        isOpen={isScanModalOpen}
-        onClose={() => setIsScanModalOpen(false)}
-        title={t('Scan EVM Barcode / QR Code')}
-        size="md"
-      >
-        <div className="space-y-4 py-2">
-          <p className="text-xs text-gray-500 text-center font-sans">
-            {t('Align the EVM unit barcode or QR code sticker inside the scanner frame below.')}
-          </p>
-          <QRScanner
-            onScanSuccess={(code) => {
-              setValue('unitCode', code, { shouldValidate: true });
-              setIsScanModalOpen(false);
-              addToast(`${t('Successfully scanned unit code')}: ${code}`, 'success');
-            }}
-          />
-        </div>
-      </Modal>
     </div>
   );
 }

@@ -20,7 +20,7 @@ const STATUS_COLORS = {
 
 const STATUS_LABELS = {
   IN_WAREHOUSE: 'In Warehouse',
-  IN_TRANSIT: 'In Transit',
+  IN_TRANSIT: 'Receiving pending',
   DEPLOYED: 'Deployed (Polling)',
   FAULTY: 'Faulty / Repair',
   DECOMMISSIONED: 'Decommissioned',
