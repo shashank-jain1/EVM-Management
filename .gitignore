@@ -52,6 +52,7 @@ appsettings.local.json
 PublishScripts/
 *.pubxml
 *.pubxml.user
+**/publish/ 
 
 # ── Databases & Cache ────────────────────
 *.db

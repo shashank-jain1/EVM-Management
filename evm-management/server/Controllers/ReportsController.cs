@@ -52,11 +52,11 @@ public class ReportsController : ControllerBase
         var where = string.Join(" AND ", conditions);
 
         var data = await conn.QueryAsync(
-            $@"SELECT s.state_name AS StateName, d.district_name AS DistrictName,
-                      COUNT(*) AS TotalUnits,
-                      SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS ControlUnits,
-                      SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS BallotUnits,
-                      SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS VvpatUnits
+            $@"SELECT s.state_name AS stateName, d.district_name AS districtName,
+                      COUNT(*) AS totalUnits,
+                      SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS controlUnits,
+                      SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS ballotUnits,
+                      SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS vvpatUnits
                FROM evm_units e
                LEFT JOIN states s ON e.current_state_id = s.state_id
                LEFT JOIN districts d ON e.current_district_id = d.district_id
@@ -114,12 +114,12 @@ public class ReportsController : ControllerBase
         parameters.Add("Limit", limit);
 
         var data = await conn.QueryAsync(
-            $@"SELECT b.batch_id AS BatchId, b.batch_code AS BatchCode, b.dispatch_date AS DispatchDate,
-                      b.expected_arrival AS ExpectedArrival, b.actual_arrival AS ActualArrival,
-                      b.dispatch_status AS DispatchStatus, b.total_units AS TotalUnits,
-                      u.full_name AS DispatchedByName,
-                      fs.state_name AS FromStateName, fd.district_name AS FromDistrictName,
-                      ts.state_name AS ToStateName, td.district_name AS ToDistrictName
+            $@"SELECT b.batch_id AS batchId, b.batch_code AS batchCode, b.dispatch_date AS dispatchDate,
+                      b.expected_arrival AS expectedArrival, b.actual_arrival AS actualArrival,
+                      b.dispatch_status AS dispatchStatus, b.total_units AS totalUnits,
+                      u.full_name AS dispatchedByName,
+                      fs.state_name AS fromStateName, fd.district_name AS fromDistrictName,
+                      ts.state_name AS toStateName, td.district_name AS toDistrictName
                FROM dispatch_batches b
                JOIN users u ON b.dispatched_by = u.user_id
                JOIN states fs ON b.from_state_id = fs.state_id
@@ -174,11 +174,11 @@ public class ReportsController : ControllerBase
         parameters.Add("Limit", limit);
 
         var data = await conn.QueryAsync(
-            $@"SELECT h.history_id AS HistoryId, h.action_type AS ActionType, h.action_date AS ActionDate,
-                      e.unit_code AS UnitCode, e.unit_type AS UnitType, u.full_name AS ActionByName,
-                      fs.state_name AS FromStateName, fd.district_name AS FromDistrictName,
-                      ts.state_name AS ToStateName, td.district_name AS ToDistrictName,
-                      b.batch_code AS BatchCode, h.remarks AS Remarks
+            $@"SELECT h.history_id AS historyId, h.action_type AS actionType, h.action_date AS actionDate,
+                      e.unit_code AS unitCode, e.unit_type AS unitType, u.full_name AS actionByName,
+                      fs.state_name AS fromStateName, fd.district_name AS fromDistrictName,
+                      ts.state_name AS toStateName, td.district_name AS toDistrictName,
+                      b.batch_code AS batchCode, h.remarks AS remarks
                FROM evm_movement_history h
                JOIN evm_units e ON h.unit_id = e.unit_id
                JOIN users u ON h.action_by = u.user_id
@@ -206,24 +206,24 @@ public class ReportsController : ControllerBase
         var statusCounts = await _evmRepo.GetStatusCountsAsync();
 
         var recentDispatches = await conn.QueryAsync(
-            @"SELECT TOP 10 b.batch_id AS BatchId, b.batch_code AS BatchCode, b.dispatch_date AS DispatchDate,
-                     b.dispatch_status AS DispatchStatus, b.total_units AS TotalUnits,
-                     fs.state_name AS FromStateName, ts.state_name AS ToStateName
+            @"SELECT TOP 10 b.batch_id AS batchId, b.batch_code AS batchCode, b.dispatch_date AS dispatchDate,
+                     b.dispatch_status AS dispatchStatus, b.total_units AS totalUnits,
+                     fs.state_name AS fromStateName, ts.state_name AS toStateName
               FROM dispatch_batches b
               JOIN states fs ON b.from_state_id = fs.state_id
               JOIN states ts ON b.to_state_id = ts.state_id
               ORDER BY b.dispatch_date DESC");
 
         var unitsByState = await conn.QueryAsync(
-            @"SELECT s.state_name AS StateName, COUNT(*) AS TotalUnits,
-                     SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS ControlUnits,
-                     SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS BallotUnits,
-                     SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS VVPATs
+            @"SELECT s.state_name AS stateName, COUNT(*) AS totalUnits,
+                     SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS controlUnits,
+                     SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS ballotUnits,
+                     SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS vvpats
               FROM evm_units e
               LEFT JOIN states s ON e.current_state_id = s.state_id
               WHERE e.is_active = 1
               GROUP BY s.state_name
-              ORDER BY TotalUnits DESC");
+              ORDER BY totalUnits DESC");
 
         return Ok(ApiResponse<object>.Ok(new
         {
@@ -250,10 +250,10 @@ public class ReportsController : ControllerBase
         var where = string.Join(" AND ", conditions);
         var total = await conn.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM audit_logs al WHERE {where}", parameters);
         var logs = await conn.QueryAsync(
-            $@"SELECT al.log_id AS LogId, al.action AS Action, al.entity_type AS EntityType, al.entity_id AS EntityId,
-                      al.old_values AS OldValues, al.new_values AS NewValues,
-                      al.ip_address AS IpAddress, al.created_at AS CreatedAt,
-                      u.user_code AS UserCode, u.full_name AS FullName
+            $@"SELECT al.log_id AS logId, al.action AS action, al.entity_type AS entityType, al.entity_id AS entityId,
+                      al.old_values AS oldValues, al.new_values AS newValues,
+                      al.ip_address AS ipAddress, al.created_at AS createdAt,
+                      u.user_code AS userCode, u.full_name AS fullName
                FROM audit_logs al
                LEFT JOIN users u ON al.user_id = u.user_id
                WHERE {where}

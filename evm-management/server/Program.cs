@@ -41,8 +41,24 @@ try
     // ─────────────────────────────────────────────
     // JWT Settings
     // ─────────────────────────────────────────────
-    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()
-        ?? throw new InvalidOperationException("JwtSettings not configured");
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+    if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.Secret))
+    {
+        var contentRoot = builder.Environment.ContentRootPath;
+        var envName = builder.Environment.EnvironmentName;
+        var appsettingsPath = Path.Combine(contentRoot, "appsettings.json");
+        var appsettingsExists = File.Exists(appsettingsPath);
+        var envAppsettingsPath = Path.Combine(contentRoot, $"appsettings.{envName}.json");
+        var envAppsettingsExists = File.Exists(envAppsettingsPath);
+        
+        var errorMsg = $"[CONFIG ERROR] JwtSettings is not configured correctly! Environment: '{envName}', ContentRootPath: '{contentRoot}'.\n" +
+                       $"  - appsettings.json exists: {appsettingsExists} (Path: {appsettingsPath})\n" +
+                       $"  - appsettings.{envName}.json exists: {envAppsettingsExists} (Path: {envAppsettingsPath})\n" +
+                       "Please verify that appsettings.json exists in the deployment directory, contains a valid 'JwtSettings' section, and the 'Secret' property is set.";
+        
+        Log.Fatal(errorMsg);
+        throw new InvalidOperationException(errorMsg);
+    }
     builder.Services.AddSingleton(jwtSettings);
     builder.Services.AddSingleton<JwtHelper>();
 
@@ -74,7 +90,7 @@ try
     {
         options.AddPolicy("EVMPolicy", policy =>
             policy
-                .WithOrigins(clientUrl, "https://markers-rows-associated-paul.trycloudflare.com")
+                .WithOrigins(clientUrl)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials());

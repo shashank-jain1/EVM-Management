@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
 
-const BASE_URL = window.location.hostname.includes('trycloudflare.com')
-  ? 'https://guidance-fur-got-appears.trycloudflare.com/api'
-  : '/api';
+const BASE_URL = '/api';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
