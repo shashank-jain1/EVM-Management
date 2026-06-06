@@ -1,7 +1,7 @@
 import React from 'react';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { LogOut, User, ChevronRight, Menu } from 'lucide-react';
+import { LogOut, User, Menu } from 'lucide-react';
 import { useTranslation } from '@/components/common/LanguageContext';
 
 const routeMap = {
@@ -70,25 +70,6 @@ export default function Header({ setMobileOpen }) {
         </button>
 
         <div>
-          <nav className="hidden sm:flex items-center space-x-1.5 text-[11px] font-sans text-slate-400">
-            {generateBreadcrumbs().map((b, idx) => {
-              const isLast = idx === generateBreadcrumbs().length - 1;
-              return (
-                <div key={b.path} className="flex items-center">
-                  {idx > 0 && <ChevronRight size={10} className="mx-1 text-slate-300 shrink-0" />}
-                  {isLast ? (
-                    <span className="font-medium text-slate-600 truncate max-w-[120px] md:max-w-[200px]">
-                      {t(b.label)}
-                    </span>
-                  ) : (
-                    <Link to={b.path} className="hover:text-blue-600 transition-colors shrink-0">
-                      {t(b.label)}
-                    </Link>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
           <h1 className="mt-0.5 text-sm sm:text-base md:text-[17px] font-extrabold font-sans text-slate-900 tracking-tight">
             {t(getPageTitle())}
           </h1>

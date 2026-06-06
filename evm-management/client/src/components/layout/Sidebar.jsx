@@ -11,7 +11,6 @@ import {
   BarChart3,
   Search,
   FileCode,
-  LogOut,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -100,40 +99,7 @@ export default function Sidebar({ collapsed, setCollapsed, onItemClick }) {
         })}
       </nav>
 
-      {/* User Information & Logout */}
-      <div className={clsx(
-        "border-t border-slate-200/40 transition-all",
-        collapsed 
-          ? "p-2 bg-transparent m-0 rounded-none" 
-          : "p-3.5 bg-slate-50/80 m-2 rounded-2xl"
-      )}>
-        <div className={clsx("flex items-center mb-3", collapsed ? "justify-center" : "gap-3 overflow-hidden")}>
-          {collapsed && (
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-navy-950 text-white font-extrabold text-xs shrink-0 shadow-sm shadow-navy-950/20 uppercase">
-              {user?.fullName?.charAt(0) || 'O'}
-            </div>
-          )}
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="text-xs font-black text-slate-800 truncate">{user?.fullName || 'Officer'}</p>
-              <p className="text-[9px] text-blue-600 font-extrabold truncate uppercase tracking-wider">
-                {t(user?.role?.replace('_', ' '))}
-              </p>
-            </div>
-          )}
-        </div>
-        <button
-          onClick={handleLogout}
-          className={clsx(
-            "flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer",
-            collapsed ? "justify-center px-0 w-9 h-9 mx-auto" : ""
-          )}
-          aria-label="Logout"
-        >
-          <LogOut size={15} className="shrink-0" />
-          {!collapsed && <span>{t('Logout Panel')}</span>}
-        </button>
-      </div>
+
     </aside>
   );
 }

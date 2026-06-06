@@ -67,7 +67,7 @@ export default function DashboardPage() {
             {t("System Dashboard")}
           </h2>
           <p className="text-xs text-gray-500 font-sans mt-0.5">
-            {t("Logged in as")} <span className="font-semibold text-gray-700">{user?.fullName}</span> (ID: <span className="font-mono text-[11px] font-bold text-saffron-600">{user?.userCode}</span>)
+            {t("Logged in as")} <span className="font-semibold text-gray-700">{user?.fullName}</span>
           </p>
         </div>
         <button
