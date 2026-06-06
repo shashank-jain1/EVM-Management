@@ -7,9 +7,9 @@
    ============================================================ */
 :root {
   /* Dynamic Slate/Blue Tones (Mapped to old Navy namespace to preserve markup compatibility) */
-  --color-navy-950: #0f172a; /* Deep slate gray */
-  --color-navy-900: #1e293b; /* Slate gray */
-  --color-navy-800: #334155; /* Cool slate */
+  --color-navy-950: #1e3b68; /* Rich steel blue (previously #0f172a) */
+  --color-navy-900: #2b4c7e; /* Medium steel blue (previously #1e293b) */
+  --color-navy-800: #3e6294; /* Slate blue (previously #334155) */
   --color-navy-700: #2563eb; /* Modern Royal Blue - primary brand color */
   --color-navy-600: #3b82f6; /* Action Blue - hover primary */
   --color-navy-500: #60a5fa;
@@ -30,8 +30,8 @@
   --color-grey-300: #e2e8f0; /* Border gray */
   --color-grey-450: #94a3b8; /* Cool gray */
   --color-grey-500: #475569; /* Darker medium slate for better contrast */
-  --color-grey-700: #1e293b; /* Higher contrast dark slate text for clear legibility */
-  --color-grey-900: #0f172a; /* Deep slate */
+  --color-grey-700: #486581; /* Slate blue text for clear legibility (previously #1e293b) */
+  --color-grey-900: #334e68; /* Dark steel slate (previously #0f172a) */
   
   /* Status Colors */
   --color-success: #10b981;  /* Emerald */

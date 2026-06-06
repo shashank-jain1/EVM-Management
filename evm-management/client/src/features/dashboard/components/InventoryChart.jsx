@@ -78,9 +78,9 @@ export default function InventoryChart({ data }) {
                   color: '#4A5568',
                 }}
               />
-              <Bar dataKey={t('Control Units')} fill="#0A1628" radius={[2, 2, 0, 0]} />
-              <Bar dataKey={t('Ballot Units')} fill="#1E3A6E" radius={[2, 2, 0, 0]} />
-              <Bar dataKey={t('VVPATs')} fill="#FF6B00" radius={[2, 2, 0, 0]} />
+              <Bar dataKey={t('Control Units')} fill="var(--color-navy-700)" radius={[2, 2, 0, 0]} />
+              <Bar dataKey={t('Ballot Units')} fill="var(--color-navy-500)" radius={[2, 2, 0, 0]} />
+              <Bar dataKey={t('VVPATs')} fill="var(--color-saffron-500)" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

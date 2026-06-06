@@ -91,7 +91,7 @@ export default function Sidebar({ collapsed, setCollapsed, onItemClick }) {
               <Icon size={18} className="shrink-0" />
               {!collapsed && <span>{t(item.label)}</span>}
               {collapsed && (
-                <div className="absolute left-full ml-2 px-2.5 py-1.5 bg-slate-900 text-white text-xs rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-md">
+                <div className="absolute left-full ml-2 px-2.5 py-1.5 bg-navy-900 text-white text-xs rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 shadow-md">
                   {t(item.label)}
                 </div>
               )}
@@ -108,9 +108,11 @@ export default function Sidebar({ collapsed, setCollapsed, onItemClick }) {
           : "p-3.5 bg-slate-50/80 m-2 rounded-2xl"
       )}>
         <div className={clsx("flex items-center mb-3", collapsed ? "justify-center" : "gap-3 overflow-hidden")}>
-          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-navy-950 text-white font-extrabold text-xs shrink-0 shadow-sm shadow-navy-950/20 uppercase">
-            {user?.fullName?.charAt(0) || 'O'}
-          </div>
+          {collapsed && (
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-navy-950 text-white font-extrabold text-xs shrink-0 shadow-sm shadow-navy-950/20 uppercase">
+              {user?.fullName?.charAt(0) || 'O'}
+            </div>
+          )}
           {!collapsed && (
             <div className="min-w-0">
               <p className="text-xs font-black text-slate-800 truncate">{user?.fullName || 'Officer'}</p>

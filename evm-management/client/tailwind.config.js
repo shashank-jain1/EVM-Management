@@ -5,12 +5,36 @@ export default {
     extend: {
       colors: {
         navy: {
-          950: '#0f172a',
-          900: '#1e293b',
-          800: '#334155',
-          700: '#2563eb',
-          600: '#3b82f6',
-          500: '#60a5fa',
+          950: 'var(--color-navy-950, #1e3b68)',
+          900: 'var(--color-navy-900, #2b4c7e)',
+          800: 'var(--color-navy-800, #3e6294)',
+          700: 'var(--color-navy-700, #2563eb)',
+          600: 'var(--color-navy-600, #3b82f6)',
+          500: 'var(--color-navy-500, #60a5fa)',
+        },
+        slate: {
+          950: 'var(--color-navy-950, #1e3b68)',
+          900: 'var(--color-navy-900, #2b4c7e)',
+          800: 'var(--color-navy-800, #3e6294)',
+          700: 'var(--color-grey-700, #486581)',
+        },
+        gray: {
+          950: 'var(--color-navy-950, #1e3b68)',
+          900: 'var(--color-navy-900, #2b4c7e)',
+          800: 'var(--color-navy-800, #3e6294)',
+          700: 'var(--color-grey-700, #486581)',
+        },
+        zinc: {
+          950: 'var(--color-navy-950, #1e3b68)',
+          900: 'var(--color-navy-900, #2b4c7e)',
+          800: 'var(--color-navy-800, #3e6294)',
+          700: 'var(--color-grey-700, #486581)',
+        },
+        neutral: {
+          950: 'var(--color-navy-950, #1e3b68)',
+          900: 'var(--color-navy-900, #2b4c7e)',
+          800: 'var(--color-navy-800, #3e6294)',
+          700: 'var(--color-grey-700, #486581)',
         },
         saffron: {
           500: '#FF6B00',

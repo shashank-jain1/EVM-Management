@@ -43,7 +43,7 @@ export default function AdminLayout() {
         <div className="relative z-40 md:hidden">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-navy-950/40 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
           <div className="fixed inset-y-0 left-0 w-[265px] bg-white shadow-2xl flex flex-col">

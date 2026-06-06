@@ -64,7 +64,7 @@ export default function RecentDispatches({ dispatches }) {
           {t('Recent Shipments Sent')}
         </h3>
         <Link
-          to="/dispatch"
+          to="/reports?tab=dispatch"
           className="text-xs font-semibold text-saffron-500 hover:text-saffron-600 font-sans transition-colors"
         >
           {t('View Logs')} &rarr;

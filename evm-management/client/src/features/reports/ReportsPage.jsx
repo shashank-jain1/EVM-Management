@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { reportsApi, referenceApi } from '@/api/reports.api';
 import Table from '@/components/common/Table';
 import Badge from '@/components/common/Badge';
@@ -19,7 +20,21 @@ import {
 import { useTranslation } from '@/components/common/LanguageContext';
 
 export default function ReportsPage() {
-  const [activeTab, setActiveTab] = useState('inventory');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'inventory');
+
+  // Sync state if url parameters change
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tabName) => {
+    setActiveTab(tabName);
+    setSearchParams({ tab: tabName });
+  };
   const { t } = useTranslation();
   const { user } = useAuthStore();
 
@@ -333,7 +348,7 @@ export default function ReportsPage() {
       {/* Tabs list */}
       <div className="border-b border-gray-200 bg-white p-1 rounded-lg flex gap-1 shadow-sm max-w-xl">
         <button
-          onClick={() => setActiveTab('inventory')}
+          onClick={() => handleTabChange('inventory')}
           className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-xs font-bold rounded transition-colors cursor-pointer select-none ${
             activeTab === 'inventory'
               ? 'bg-navy-950 text-white'
@@ -344,7 +359,7 @@ export default function ReportsPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('dispatch')}
+          onClick={() => handleTabChange('dispatch')}
           className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-xs font-bold rounded transition-colors cursor-pointer select-none ${
             activeTab === 'dispatch'
               ? 'bg-navy-950 text-white'
@@ -355,7 +370,7 @@ export default function ReportsPage() {
         </button>
 
         <button
-          onClick={() => setActiveTab('timeline')}
+          onClick={() => handleTabChange('timeline')}
           className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-xs font-bold rounded transition-colors cursor-pointer select-none ${
             activeTab === 'timeline'
               ? 'bg-navy-950 text-white'

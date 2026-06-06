@@ -1,19 +1,43 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 import clsx from 'clsx';
 
 /**
  * Debounced search input with clear button
- * @param {Function} onSearch - called after debounce with current value
- * @param {number} debounceMs - debounce delay (default 300ms)
+ * Accepts a controlled value prop and onSearch handler
  */
-export default function SearchInput({ onSearch, debounceMs = 300, placeholder = 'Search...', className, initialValue = '' }) {
-  const [value, setValue] = useState(initialValue);
-
+export default function SearchInput({ 
+  value: valueProp = '', 
+  onSearch, 
+  debounceMs = 300, 
+  placeholder = 'Search...', 
+  className 
+}) {
+  const [value, setValue] = useState(valueProp);
+  const onSearchRef = useRef(onSearch);
+  const isFirstRender = useRef(true);
+  
+  // Keep callback ref updated to avoid stale closures
   useEffect(() => {
-    const timer = setTimeout(() => { onSearch(value); }, debounceMs);
+    onSearchRef.current = onSearch;
+  }, [onSearch]);
+
+  // Sync internal value with valueProp when valueProp changes from parent (e.g. on Reset Filters)
+  useEffect(() => {
+    setValue(valueProp);
+  }, [valueProp]);
+
+  // Debounce user input, skipping the initial mount
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const timer = setTimeout(() => { 
+      onSearchRef.current(value); 
+    }, debounceMs);
     return () => clearTimeout(timer);
-  }, [value, debounceMs, onSearch]);
+  }, [value, debounceMs]);
 
   return (
     <div className={clsx('relative', className)}>

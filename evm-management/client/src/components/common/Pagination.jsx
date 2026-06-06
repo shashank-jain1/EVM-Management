@@ -25,7 +25,7 @@ export default function Pagination({ page, totalPages, onPageChange, className }
         }}
         disabled={currentPage === 1}
         aria-label="Previous page"
-        className="p-1.5 rounded-md text-gray-605 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="p-1.5 rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronLeft size={16} />
       </button>
@@ -48,7 +48,7 @@ export default function Pagination({ page, totalPages, onPageChange, className }
         }}
         disabled={currentPage === totalPages}
         aria-label="Next page"
-        className="p-1.5 rounded-md text-gray-605 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="p-1.5 rounded-md text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronRight size={16} />
       </button>
@@ -70,7 +70,7 @@ function PageBtn({ page, current, onClick }) {
         'w-8 h-8 rounded-md text-sm font-medium transition-colors',
         page === current
           ? 'bg-navy-800 text-white'
-          : 'text-gray-605 hover:bg-gray-100'
+          : 'text-gray-600 hover:bg-gray-100'
       )}
     >
       {page}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { LogOut, User, Bell, ChevronRight, Menu } from 'lucide-react';
+import { LogOut, User, ChevronRight, Menu } from 'lucide-react';
 import { useTranslation } from '@/components/common/LanguageContext';
 
 const routeMap = {
@@ -106,14 +106,7 @@ export default function Header({ setMobileOpen }) {
           {language === 'en' ? 'हिन्दी' : 'English'}
         </button>
 
-        {/* Notification indicator */}
-        <button
-          className="relative p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-          aria-label="View notifications"
-        >
-          <Bell size={18} />
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-saffron-500 border-2 border-white animate-pulse" />
-        </button>
+
 
         {/* User profile dropdown summary */}
         <div className="flex items-center gap-3.5 pl-3 border-l border-slate-200/80">

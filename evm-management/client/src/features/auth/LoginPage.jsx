@@ -100,7 +100,7 @@ export default function LoginPage() {
           <img src="/logo.png" className="h-16 w-auto object-contain" alt="ECI Logo" />
         </div>
         <h2 className="text-2xl font-extrabold text-slate-800 font-sans tracking-tight">
-          {t('EVM Inventory Management system')}
+          {t('EVM Inventory Management System')}
         </h2>
         <p className="text-sm text-slate-500 font-sans font-semibold tracking-wide mt-2.5 uppercase">
           {t('Madhya Pradesh State Election Commission')}
