@@ -119,7 +119,7 @@ export default function EditUserModal({ isOpen, onClose, user, onUpdate }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="relative">
               <Input
-                label={t('New Security Password')}
+                label={t('New Password')}
                 type={showPassword ? 'text' : 'password'}
                 {...register('password')}
                 error={errors.password?.message}

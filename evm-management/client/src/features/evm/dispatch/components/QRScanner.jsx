@@ -178,15 +178,50 @@ export default function QRScanner({ onScanSuccess, hideManualOption = false }) {
       if (deviceId) {
         await codeReader.decodeFromVideoDevice(deviceId, videoRef.current, scanCallback);
       } else {
-        // Initial start: target rear camera on mobile, default camera on desktop
-        const constraints = {
-          video: {
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 725 }
+        // Try multiple camera constraint strategies for cross-platform compatibility
+        let started = false;
+        
+        // Strategy 1: Try rear camera (works on most mobile devices)
+        try {
+          const rearConstraints = {
+            video: {
+              facingMode: 'environment',
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            }
+          };
+          await codeReader.decodeFromConstraints(rearConstraints, videoRef.current, scanCallback);
+          started = true;
+        } catch (rearErr) {
+          console.warn('[QRScanner] Rear camera failed, trying fallback:', rearErr);
+        }
+
+        // Strategy 2: If rear camera failed, try any available camera
+        if (!started) {
+          try {
+            const anyConstraints = {
+              video: {
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+              }
+            };
+            await codeReader.decodeFromConstraints(anyConstraints, videoRef.current, scanCallback);
+            started = true;
+          } catch (anyErr) {
+            console.warn('[QRScanner] Any camera fallback failed:', anyErr);
           }
-        };
-        await codeReader.decodeFromConstraints(constraints, videoRef.current, scanCallback);
+        }
+
+        // Strategy 3: If all constraints failed, try with minimal constraints
+        if (!started) {
+          try {
+            await codeReader.decodeFromConstraints({ video: true }, videoRef.current, scanCallback);
+            started = true;
+          } catch (minErr) {
+            console.error('[QRScanner] All camera strategies failed:', minErr);
+            throw minErr;
+          }
+        }
       }
 
       // Enumerate cameras after the stream has started, ensuring permissions and labels are fully loaded

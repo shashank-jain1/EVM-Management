@@ -131,7 +131,6 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }) {
             label={t('Username')}
             {...register('userCode')}
             error={errors.userCode?.message}
-            helperText={t('Unique login ID (e.g. MH_SO_01, USER_CENTRAL)')}
             inputClassName="uppercase font-mono text-xs"
             required
           />
@@ -141,7 +140,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }) {
           <FormField
             control={control}
             name="stateId"
-            label={t('State Jurisdictional Allocation')}
+            label={t('State')}
             options={(statesQuery.data || []).map((s) => ({
               label: s.stateName ?? s.StateName,
               value: s.stateId != null ? String(s.stateId) : s.StateId != null ? String(s.StateId) : '',
@@ -155,7 +154,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }) {
           <FormField
             control={control}
             name="districtId"
-            label={t('District Allocation')}
+            label={t('District')}
             options={(districtsQuery.data || []).map((d) => ({
               label: d.districtName ?? d.DistrictName,
               value: d.districtId != null ? String(d.districtId) : d.DistrictId != null ? String(d.DistrictId) : '',
@@ -176,7 +175,7 @@ export default function CreateUserModal({ isOpen, onClose, onCreate }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
           <div className="relative">
             <Input
-              label={t('Security Password')}
+              label={t('Password')}
               type={showPassword ? 'text' : 'password'}
               {...register('password')}
               error={errors.password?.message}
