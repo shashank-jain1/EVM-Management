@@ -15,7 +15,8 @@ import {
   Cpu,
   Truck,
   History,
-  Grid
+  Grid,
+  Box
 } from 'lucide-react';
 import { useTranslation } from '@/components/common/LanguageContext';
 
@@ -111,6 +112,19 @@ export default function ReportsPage() {
       };
     },
     enabled: activeTab === 'timeline',
+  });
+
+  // 4. Fetch Box Summary Report
+  const boxSummaryQuery = useQuery({
+    queryKey: ['reportBoxSummary', selectedState, selectedDistrict],
+    queryFn: async () => {
+      const res = await reportsApi.boxSummary({
+        stateId: selectedState || undefined,
+        districtId: selectedDistrict || undefined,
+      });
+      return res.data.data || [];
+    },
+    enabled: activeTab === 'boxes',
   });
 
   // Export to CSV helper
@@ -330,6 +344,109 @@ export default function ReportsPage() {
     );
   };
 
+  // ── BOX SUMMARY TAB ──
+  const renderBoxSummaryTab = () => {
+    const columns = [
+      { header: t('Box Number'), accessor: 'boxNumber', render: (val) => <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Box {val}</span> },
+      { header: t('State'), accessor: 'stateName', render: (val) => <span className="text-xs text-gray-600">{val || '—'}</span> },
+      { header: t('District'), accessor: 'districtName', render: (val) => <span className="text-xs text-gray-600">{val || 'State Pool'}</span> },
+      { header: t('Units in Box'), accessor: 'unitCount', render: (val) => <span className="font-mono text-xs font-bold text-gray-800">{val}</span> },
+      { header: t('Capacity'), accessor: 'unitCount', render: (val) => {
+        const percentage = (val / 10) * 100;
+        const color = percentage >= 100 ? 'text-red-600' : percentage >= 70 ? 'text-amber-600' : 'text-emerald-600';
+        return (
+          <div className="flex items-center gap-2">
+            <span className={`font-mono text-xs font-bold ${color}`}>{val}/10</span>
+            <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full ${percentage >= 100 ? 'bg-red-500' : percentage >= 70 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                style={{ width: `${Math.min(percentage, 100)}%` }}
+              />
+            </div>
+          </div>
+        );
+      }},
+      { header: t('Fill Status'), accessor: 'unitCount', render: (val) => {
+        const percentage = (val / 10) * 100;
+        let statusText, statusColor;
+        if (percentage >= 100) { statusText = t('Full'); statusColor = 'bg-red-100 text-red-700'; }
+        else if (percentage >= 70) { statusText = t('Filling'); statusColor = 'bg-amber-100 text-amber-700'; }
+        else { statusText = t('Available'); statusColor = 'bg-emerald-100 text-emerald-700'; }
+        return <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${statusColor}`}>{statusText}</span>;
+      }},
+    ];
+
+    const data = boxSummaryQuery.data || [];
+
+    return (
+      <div className="space-y-4">
+        {/* Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50/50">
+          <Select
+            label={t('State')}
+            value={selectedState}
+            onChange={(val) => {
+              setSelectedState(val);
+              setSelectedDistrict('');
+            }}
+            options={(statesQuery.data || []).map((s) => ({ label: s.stateName ?? s.StateName, value: s.stateId != null ? String(s.stateId) : s.StateId != null ? String(s.StateId) : '' }))}
+            isLoading={statesQuery.isLoading}
+            placeholder={t('All States')}
+            disabled={user?.role !== 'ADMIN'}
+            searchable={true}
+          />
+
+          <Select
+            label={t('District')}
+            value={selectedDistrict}
+            onChange={setSelectedDistrict}
+            options={(districtsQuery.data || []).map((d) => ({ label: d.districtName ?? d.DistrictName, value: d.districtId != null ? String(d.districtId) : d.DistrictId != null ? String(d.DistrictId) : '' }))}
+            disabled={!selectedState || user?.role === 'DISTRICT_OFFICER'}
+            isLoading={districtsQuery.isLoading}
+            placeholder={selectedState ? t('All Districts') : t('Select State First')}
+            searchable={true}
+          />
+
+          <div className="flex items-end pb-0.5">
+            <button
+              onClick={() => {
+                setSelectedState(user?.role !== 'ADMIN' && user?.stateId ? String(user.stateId) : '');
+                setSelectedDistrict(user?.role === 'DISTRICT_OFFICER' && user?.districtId ? String(user.districtId) : '');
+              }}
+              className="h-9 px-4 text-xs font-bold text-gray-500 hover:text-saffron-600 transition-colors uppercase tracking-wider font-mono border border-gray-350 bg-white rounded-md w-full cursor-pointer hover:bg-gray-50"
+            >
+              {t('Reset Filters')}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center pb-2 border-b border-gray-100">
+          <h3 className="text-xs font-bold font-sans text-navy-900 uppercase tracking-wide flex items-center gap-1.5">
+            <Box size={15} className="text-gray-400" />
+            {t('Storage Box Summary Report')}
+          </h3>
+          <Button
+            onClick={() => exportToCSV(data, 'ECI_Box_Summary')}
+            disabled={data.length === 0}
+            variant="secondary"
+            size="sm"
+            className="cursor-pointer text-xs h-8 border border-gray-250 bg-white"
+          >
+            <span className="flex items-center gap-1.5"><FileSpreadsheet size={13} /> {t('Export CSV')}</span>
+          </Button>
+        </div>
+
+        <Table
+          columns={columns}
+          data={data}
+          isLoading={boxSummaryQuery.isLoading}
+          emptyStateTitle={t('No Box Data Found')}
+          emptyStateDescription={t('Register EVM units to see box allocation data.')}
+        />
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Title block */}
@@ -378,6 +495,17 @@ export default function ReportsPage() {
         >
           <History size={14} /> {t('Movement Timeline')}
         </button>
+
+        <button
+          onClick={() => handleTabChange('boxes')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 text-xs font-bold rounded transition-colors cursor-pointer select-none ${
+            activeTab === 'boxes'
+              ? 'bg-navy-950 text-white'
+              : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'
+          }`}
+        >
+          <Box size={14} /> {t('Box Summary')}
+        </button>
       </div>
 
       {/* Tab Panels */}
@@ -385,6 +513,7 @@ export default function ReportsPage() {
         {activeTab === 'inventory' && renderInventoryTab()}
         {activeTab === 'dispatch' && renderDispatchTab()}
         {activeTab === 'timeline' && renderTimelineTab()}
+        {activeTab === 'boxes' && renderBoxSummaryTab()}
       </div>
     </div>
   );

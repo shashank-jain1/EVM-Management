@@ -16,6 +16,8 @@ public interface IEvmRepository
     Task<List<object>> GlobalSearchAsync(string query);
     Task<List<dynamic>> GetInventorySummaryAsync();
     Task<Dictionary<string, int>> GetStatusCountsAsync();
+    Task<int?> GetNextBoxNumberAsync(int? stateId, int? districtId);
+    Task<int> GetBoxCountAsync(int? stateId, int? districtId, int boxNumber);
 }
 
 public class EvmRepository : IEvmRepository
@@ -33,6 +35,7 @@ public class EvmRepository : IEvmRepository
                      e.serial_number AS SerialNumber, e.current_state_id AS CurrentStateId,
                      e.current_district_id AS CurrentDistrictId,
                      e.current_location_description AS CurrentLocationDescription,
+                     e.box_number AS BoxNumber,
                      e.current_status AS CurrentStatus, e.is_active AS IsActive,
                      e.created_at AS CreatedAt, e.updated_at AS UpdatedAt,
                      s.state_name AS StateName, s.state_code AS StateCode,
@@ -53,6 +56,7 @@ public class EvmRepository : IEvmRepository
                      e.serial_number AS SerialNumber, e.current_state_id AS CurrentStateId,
                      e.current_district_id AS CurrentDistrictId,
                      e.current_location_description AS CurrentLocationDescription,
+                     e.box_number AS BoxNumber,
                      e.current_status AS CurrentStatus, e.is_active AS IsActive,
                      e.created_at AS CreatedAt, e.updated_at AS UpdatedAt,
                      s.state_name AS StateName, s.state_code AS StateCode,
@@ -70,16 +74,16 @@ public class EvmRepository : IEvmRepository
         return await conn.ExecuteScalarAsync<int>(
             @"INSERT INTO evm_units (unit_code, unit_type, manufacturer, manufacturing_year,
                 serial_number, current_state_id, current_district_id, current_location_description,
-                current_status, created_by)
+                box_number, current_status, created_by)
               OUTPUT INSERTED.unit_id
               VALUES (@UnitCode, @UnitType, @Manufacturer, @ManufacturingYear,
                 @SerialNumber, @CurrentStateId, @CurrentDistrictId, @CurrentLocationDescription,
-                'IN_WAREHOUSE', @CreatedBy)",
+                @BoxNumber, 'IN_WAREHOUSE', @CreatedBy)",
             new
             {
                 unit.UnitCode, unit.UnitType, unit.Manufacturer, unit.ManufacturingYear,
                 unit.SerialNumber, unit.CurrentStateId, unit.CurrentDistrictId,
-                unit.CurrentLocationDescription, CreatedBy = createdBy
+                unit.CurrentLocationDescription, unit.BoxNumber, CreatedBy = createdBy
             });
     }
 
@@ -116,6 +120,7 @@ public class EvmRepository : IEvmRepository
                       e.manufacturer AS Manufacturer, e.manufacturing_year AS ManufacturingYear,
                       e.serial_number AS SerialNumber, e.current_status AS CurrentStatus,
                       e.current_location_description AS CurrentLocationDescription,
+                      e.box_number AS BoxNumber,
                       e.current_state_id AS CurrentStateId, e.current_district_id AS CurrentDistrictId,
                       e.created_at AS CreatedAt, e.updated_at AS UpdatedAt,
                       s.state_name AS StateName, s.state_code AS StateCode,
@@ -204,5 +209,40 @@ public class EvmRepository : IEvmRepository
         using var conn = _db.CreateConnection();
         var rows = await conn.QueryAsync(@"SELECT current_status AS Status, COUNT(*) AS Cnt FROM evm_units WHERE is_active = 1 GROUP BY current_status");
         return rows.ToDictionary(r => (string)r.Status, r => (int)r.Cnt);
+    }
+
+    public async Task<int?> GetNextBoxNumberAsync(int? stateId, int? districtId)
+    {
+        using var conn = _db.CreateConnection();
+        var conditions = new List<string> { "is_active = 1" };
+        var parameters = new DynamicParameters();
+
+        if (stateId.HasValue) { conditions.Add("current_state_id = @StateId"); parameters.Add("StateId", stateId.Value); }
+        if (districtId.HasValue) { conditions.Add("current_district_id = @DistrictId"); parameters.Add("DistrictId", districtId.Value); }
+
+        var where = string.Join(" AND ", conditions);
+
+        var maxBox = await conn.QueryFirstOrDefaultAsync<int?>(
+            $"SELECT MAX(box_number) FROM evm_units WHERE {where} AND box_number IS NOT NULL",
+            parameters);
+
+        return maxBox.HasValue ? maxBox.Value + 1 : 1;
+    }
+
+    public async Task<int> GetBoxCountAsync(int? stateId, int? districtId, int boxNumber)
+    {
+        using var conn = _db.CreateConnection();
+        var conditions = new List<string> { "is_active = 1", "box_number = @BoxNumber" };
+        var parameters = new DynamicParameters();
+        parameters.Add("BoxNumber", boxNumber);
+
+        if (stateId.HasValue) { conditions.Add("current_state_id = @StateId"); parameters.Add("StateId", stateId.Value); }
+        if (districtId.HasValue) { conditions.Add("current_district_id = @DistrictId"); parameters.Add("DistrictId", districtId.Value); }
+
+        var where = string.Join(" AND ", conditions);
+
+        return await conn.ExecuteScalarAsync<int>(
+            $"SELECT COUNT(*) FROM evm_units WHERE {where}",
+            parameters);
     }
 }

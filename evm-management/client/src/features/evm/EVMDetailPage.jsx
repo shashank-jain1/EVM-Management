@@ -207,6 +207,15 @@ export default function EVMDetailPage() {
               )}
             </div>
 
+            {evm.boxNumber && (
+              <div>
+                <span className="text-[10px] text-gray-400 font-sans uppercase font-semibold">{t('Storage Box')}</span>
+                <p className="text-xs font-bold text-indigo-600 mt-0.5">
+                  <span className="bg-indigo-50 px-2 py-0.5 rounded font-mono">Box {evm.boxNumber}</span>
+                </p>
+              </div>
+            )}
+
             <div className="pt-2 border-t border-gray-100">
               <span className="text-[10px] text-gray-400 font-sans uppercase font-semibold">{t('Registry Creation')}</span>
               <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1 font-mono">

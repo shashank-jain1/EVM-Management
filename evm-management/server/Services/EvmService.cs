@@ -31,6 +31,26 @@ public class EvmService : IEvmService
         var existing = await _evmRepo.FindByCodeAsync(request.UnitCode);
         if (existing != null) throw new ConflictException("Unit code already exists");
 
+        // Box auto-increment logic: if no box specified, auto-assign
+        int? boxNumber = request.BoxNumber;
+        if (!boxNumber.HasValue)
+        {
+            // Get the next available box for this state/district
+            var nextBox = await _evmRepo.GetNextBoxNumberAsync(request.StateId, request.DistrictId);
+            boxNumber = nextBox;
+        }
+        else
+        {
+            // Validate capacity if user specified a box
+            var currentCount = await _evmRepo.GetBoxCountAsync(request.StateId, request.DistrictId, boxNumber.Value);
+            if (currentCount >= 10)
+            {
+                // Box is full, auto-assign to next box
+                var nextBox = await _evmRepo.GetNextBoxNumberAsync(request.StateId, request.DistrictId);
+                boxNumber = nextBox;
+            }
+        }
+
         var unit = new EvmUnit
         {
             UnitCode = request.UnitCode,
@@ -41,6 +61,7 @@ public class EvmService : IEvmService
             CurrentStateId = request.StateId,
             CurrentDistrictId = request.DistrictId,
             CurrentLocationDescription = request.LocationDescription,
+            BoxNumber = boxNumber,
         };
 
         var unitId = await _evmRepo.CreateUnitAsync(unit, userId);

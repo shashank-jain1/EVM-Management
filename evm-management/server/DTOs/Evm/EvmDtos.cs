@@ -10,6 +10,7 @@ public class CreateEvmRequest
     public int StateId { get; set; }
     public int? DistrictId { get; set; }
     public string? LocationDescription { get; set; }
+    public int? BoxNumber { get; set; }
 }
 
 public class EvmListFilter

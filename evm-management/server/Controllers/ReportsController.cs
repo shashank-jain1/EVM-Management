@@ -75,6 +75,95 @@ public class ReportsController : ControllerBase
         return Ok(ApiResponse<object>.Ok(counts));
     }
 
+    /// <summary>GET /api/reports/box-summary — units per box with fill status</summary>
+    [HttpGet("reports/box-summary")]
+    public async Task<IActionResult> BoxSummary([FromQuery] int? stateId, [FromQuery] int? districtId)
+    {
+        using var conn = _db.CreateConnection();
+        var conditions = new List<string> { "e.is_active = 1", "e.box_number IS NOT NULL" };
+        var parameters = new DynamicParameters();
+
+        // Location restriction for non-admins
+        var userStateId = User.FindFirst("stateId") is { } s ? int.Parse(s.Value) : (int?)null;
+        var userDistrictId = User.FindFirst("districtId") is { } d ? int.Parse(d.Value) : (int?)null;
+
+        if (!User.IsInRole("ADMIN"))
+        {
+            if (User.IsInRole("DISTRICT_OFFICER"))
+            {
+                stateId = userStateId;
+                districtId = userDistrictId;
+            }
+            else if (User.IsInRole("STATE_OFFICER"))
+            {
+                stateId = userStateId;
+            }
+        }
+
+        if (stateId.HasValue) { conditions.Add("e.current_state_id = @StateId"); parameters.Add("StateId", stateId.Value); }
+        if (districtId.HasValue) { conditions.Add("e.current_district_id = @DistrictId"); parameters.Add("DistrictId", districtId.Value); }
+
+        var where = string.Join(" AND ", conditions);
+
+        var data = await conn.QueryAsync(
+            $@"SELECT e.box_number AS boxNumber,
+                      COUNT(*) AS unitCount,
+                      s.state_name AS stateName,
+                      d.district_name AS districtName
+               FROM evm_units e
+               LEFT JOIN states s ON e.current_state_id = s.state_id
+               LEFT JOIN districts d ON e.current_district_id = d.district_id
+               WHERE {where}
+               GROUP BY e.box_number, s.state_name, d.district_name
+               ORDER BY s.state_name, d.district_name, e.box_number", parameters);
+
+        return Ok(ApiResponse<object>.Ok(data));
+    }
+
+    /// <summary>GET /api/reports/box-allocation — which EVM is in which box</summary>
+    [HttpGet("reports/box-allocation")]
+    public async Task<IActionResult> BoxAllocation([FromQuery] int? stateId, [FromQuery] int? districtId, [FromQuery] int? boxNumber)
+    {
+        using var conn = _db.CreateConnection();
+        var conditions = new List<string> { "e.is_active = 1", "e.box_number IS NOT NULL" };
+        var parameters = new DynamicParameters();
+
+        // Location restriction for non-admins
+        var userStateId = User.FindFirst("stateId") is { } s ? int.Parse(s.Value) : (int?)null;
+        var userDistrictId = User.FindFirst("districtId") is { } d ? int.Parse(d.Value) : (int?)null;
+
+        if (!User.IsInRole("ADMIN"))
+        {
+            if (User.IsInRole("DISTRICT_OFFICER"))
+            {
+                stateId = userStateId;
+                districtId = userDistrictId;
+            }
+            else if (User.IsInRole("STATE_OFFICER"))
+            {
+                stateId = userStateId;
+            }
+        }
+
+        if (stateId.HasValue) { conditions.Add("e.current_state_id = @StateId"); parameters.Add("StateId", stateId.Value); }
+        if (districtId.HasValue) { conditions.Add("e.current_district_id = @DistrictId"); parameters.Add("DistrictId", districtId.Value); }
+        if (boxNumber.HasValue) { conditions.Add("e.box_number = @BoxNumber"); parameters.Add("BoxNumber", boxNumber.Value); }
+
+        var where = string.Join(" AND ", conditions);
+
+        var data = await conn.QueryAsync(
+            $@"SELECT e.unit_code AS unitCode, e.unit_type AS unitType,
+                      e.serial_number AS serialNumber, e.box_number AS boxNumber,
+                      s.state_name AS stateName, d.district_name AS districtName
+               FROM evm_units e
+               LEFT JOIN states s ON e.current_state_id = s.state_id
+               LEFT JOIN districts d ON e.current_district_id = d.district_id
+               WHERE {where}
+               ORDER BY e.box_number, e.unit_code", parameters);
+
+        return Ok(ApiResponse<object>.Ok(data));
+    }
+
     /// <summary>GET /api/reports/dispatch-history — dispatch batches with date range filter</summary>
     [HttpGet("reports/dispatch-history")]
     public async Task<IActionResult> DispatchHistory([FromQuery] DateTime? from, [FromQuery] DateTime? to, [FromQuery] int page = 1, [FromQuery] int limit = 10)

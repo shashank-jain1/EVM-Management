@@ -11,6 +11,7 @@ public class EvmUnit
     public int? CurrentStateId { get; set; }
     public int? CurrentDistrictId { get; set; }
     public string? CurrentLocationDescription { get; set; }
+    public int? BoxNumber { get; set; }
     public string CurrentStatus { get; set; } = "IN_WAREHOUSE"; // IN_WAREHOUSE | IN_TRANSIT
     public bool IsActive { get; set; } = true;
     public int CreatedBy { get; set; }
@@ -64,6 +65,7 @@ public class DispatchItem
     public string ItemStatus { get; set; } = "DISPATCHED"; // DISPATCHED | RECEIVED | MISSING | DAMAGED
     public DateTime? ReceivedAt { get; set; }
     public string? ConditionOnReceipt { get; set; } // GOOD | DAMAGED | FAULTY
+    public int? BoxNumber { get; set; }
     public string? Remarks { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

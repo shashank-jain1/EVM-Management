@@ -59,11 +59,14 @@ public class DispatchRepository : IDispatchRepository
         using var conn = _db.CreateConnection();
         for (int i = 0; i < unitIds.Count; i++)
         {
-            var boxNum = (i / 10) + 1;
-            var boxName = $"Box {boxNum}";
+            // Get the unit's box_number from the database
+            var boxNumber = await conn.QueryFirstOrDefaultAsync<int?>(
+                "SELECT box_number FROM evm_units WHERE unit_id = @UnitId",
+                new { UnitId = unitIds[i] });
+
             await conn.ExecuteAsync(
-                "INSERT INTO dispatch_items (batch_id, unit_id, item_status, remarks) VALUES (@BatchId, @UnitId, 'DISPATCHED', @Remarks)",
-                new { BatchId = batchId, UnitId = unitIds[i], Remarks = boxName });
+                "INSERT INTO dispatch_items (batch_id, unit_id, item_status, box_number, remarks) VALUES (@BatchId, @UnitId, 'DISPATCHED', @BoxNumber, @Remarks)",
+                new { BatchId = batchId, UnitId = unitIds[i], BoxNumber = boxNumber, Remarks = $"Box {boxNumber}" });
         }
     }
 
@@ -96,7 +99,8 @@ public class DispatchRepository : IDispatchRepository
         batch.Items = (await conn.QueryAsync<DispatchItem>(
             @"SELECT di.item_id AS ItemId, di.batch_id AS BatchId, di.unit_id AS UnitId,
                      di.item_status AS ItemStatus, di.received_at AS ReceivedAt,
-                     di.condition_on_receipt AS ConditionOnReceipt, di.remarks AS Remarks,
+                     di.condition_on_receipt AS ConditionOnReceipt, di.box_number AS BoxNumber,
+                     di.remarks AS Remarks,
                      di.created_at AS CreatedAt, di.updated_at AS UpdatedAt,
                      e.unit_code AS UnitCode, e.unit_type AS UnitType, e.serial_number AS SerialNumber,
                      e.manufacturer AS Manufacturer, e.manufacturing_year AS ManufacturingYear

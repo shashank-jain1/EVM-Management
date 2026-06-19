@@ -137,6 +137,11 @@ export default function EVMListPage() {
       ),
     },
     {
+      header: t('Box'),
+      accessor: 'boxNumber',
+      render: (val) => val ? <span className="font-mono text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Box {val}</span> : <span className="text-xs text-gray-400">—</span>,
+    },
+    {
       header: t('Status'),
       accessor: 'currentStatus',
       render: (val) => <Badge status={val} />,

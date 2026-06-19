@@ -6,6 +6,8 @@ export const reportsApi = {
   statusBreakdown: () => api.get('/reports/status-breakdown'),
   dispatchHistory: (params) => api.get('/reports/dispatch-history', { params }),
   movementTimeline: (params) => api.get('/reports/movement-timeline', { params }),
+  boxSummary: (params) => api.get('/reports/box-summary', { params }),
+  boxAllocation: (params) => api.get('/reports/box-allocation', { params }),
   auditLogs: (params) => api.get('/audit', { params }),
   globalSearch: (q) => api.get('/search/global', { params: { q } }),
 };

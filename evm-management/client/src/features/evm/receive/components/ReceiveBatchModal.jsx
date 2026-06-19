@@ -195,6 +195,7 @@ export default function ReceiveBatchModal({ isOpen, onClose, batch }) {
                 <th className="px-3 py-2.5 text-left w-12">{t('Recd.')}</th>
                 <th className="px-3 py-2.5 text-left">{t('Unit Code')}</th>
                 <th className="px-3 py-2.5 text-left w-32">{t('Type')}</th>
+                <th className="px-3 py-2.5 text-left w-20">{t('Box')}</th>
                 <th className="px-3 py-2.5 text-left w-48">{t('Condition on Receipt')}</th>
                 <th className="px-3 py-2.5 text-left">{t('Remarks')}</th>
               </tr>
@@ -223,6 +224,13 @@ export default function ReceiveBatchModal({ isOpen, onClose, batch }) {
                     </td>
                     <td className="px-3 py-2">
                       <Badge status={item.unitType} />
+                    </td>
+                    <td className="px-3 py-2">
+                      {item.boxNumber ? (
+                        <span className="font-mono text-xs font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Box {item.boxNumber}</span>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
                     </td>
                     <td className="px-3 py-2">
                       <select

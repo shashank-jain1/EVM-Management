@@ -3,7 +3,7 @@ import Badge from '@/components/common/Badge';
 import { Cpu, Trash2 } from 'lucide-react';
 
 export default function ScannedUnitCard({ unit, onRemove, index }) {
-  const boxNum = Math.floor(index / 10) + 1;
+  const boxNum = unit.boxNumber || Math.floor(index / 10) + 1;
 
   return (
     <div className="bg-white border border-gray-200 rounded p-3.5 shadow-sm hover:border-gray-300 transition-colors flex items-center justify-between gap-4">

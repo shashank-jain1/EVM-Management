@@ -72,6 +72,7 @@ CREATE TABLE evm_units (
     current_state_id          INT           REFERENCES states(state_id),
     current_district_id       INT           REFERENCES districts(district_id),
     current_location_description NVARCHAR(255),
+    box_number                INT           NULL,
     current_status            NVARCHAR(30)  NOT NULL DEFAULT 'IN_WAREHOUSE'
                               CHECK (current_status IN ('IN_WAREHOUSE','IN_TRANSIT')),
     is_active                 BIT           NOT NULL DEFAULT 1,
@@ -116,6 +117,7 @@ CREATE TABLE dispatch_items (
                         CHECK (item_status IN ('DISPATCHED','RECEIVED','MISSING','DAMAGED')),
     received_at         DATETIME2,
     condition_on_receipt NVARCHAR(20) CHECK (condition_on_receipt IN ('GOOD','DAMAGED','FAULTY')),
+    box_number          INT           NULL,
     remarks             NVARCHAR(255),
     created_at          DATETIME2     NOT NULL DEFAULT GETDATE(),
     updated_at          DATETIME2     NOT NULL DEFAULT GETDATE()
@@ -180,6 +182,7 @@ CREATE INDEX IX_users_user_code           ON users(user_code);
 CREATE INDEX IX_users_state_district      ON users(state_id, district_id);
 CREATE INDEX IX_evm_unit_code             ON evm_units(unit_code);
 CREATE INDEX IX_evm_status                ON evm_units(current_status);
+CREATE INDEX IX_evm_box_number            ON evm_units(box_number);
 CREATE INDEX IX_evm_state_district        ON evm_units(current_state_id, current_district_id);
 CREATE INDEX IX_dispatch_batch_code       ON dispatch_batches(batch_code);
 CREATE INDEX IX_dispatch_status           ON dispatch_batches(dispatch_status);
@@ -208,6 +211,7 @@ SELECT
     e.serial_number,
     e.current_status,
     e.current_location_description,
+    e.box_number,
     e.is_active,
     s.state_id,
     s.state_name,
