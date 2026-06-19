@@ -122,12 +122,11 @@ INSERT INTO evm_units (
 ('EVM-CU-2023-MH-00002', 'CONTROL_UNIT',  'Electronics Corporation of India', 2023, 'SN-CU-00002', 1, 2, N'Pune District Warehouse',  'IN_WAREHOUSE', 1),
 ('EVM-BU-2023-MH-00001', 'BALLOT_UNIT',   'Bharat Electronics Limited',       2023, 'SN-BU-00001', 1, 1, N'Mumbai Central Warehouse', 'IN_WAREHOUSE', 1),
 ('EVM-BU-2023-MH-00002', 'BALLOT_UNIT',   'Bharat Electronics Limited',       2023, 'SN-BU-00002', 1, 2, N'Pune District Warehouse',  'IN_WAREHOUSE', 1),
-('EVM-VP-2023-MH-00001', 'VVPAT',         'Electronics Corporation of India', 2023, 'SN-VP-00001', 1, 1, N'Mumbai Central Warehouse', 'IN_WAREHOUSE', 1),
 ('EVM-CU-2022-UP-00001', 'CONTROL_UNIT',  'Bharat Electronics Limited',       2022, 'SN-CU-00003', 2, 4, N'Lucknow State Warehouse',  'IN_WAREHOUSE', 1),
 ('EVM-BU-2022-UP-00001', 'BALLOT_UNIT',   'Electronics Corporation of India', 2022, 'SN-BU-00003', 2, 4, N'Lucknow State Warehouse',  'IN_WAREHOUSE', 1),
-('EVM-VP-2022-UP-00001', 'VVPAT',         'Bharat Electronics Limited',       2022, 'SN-VP-00002', 2, 5, N'Agra District Warehouse',  'IN_WAREHOUSE', 1),
-('EVM-CU-2021-MP-00001', 'CONTROL_UNIT',  'Electronics Corporation of India', 2021, 'SN-CU-00004', 3, 7, N'Bhopal State Warehouse',   'FAULTY',       1),
-('EVM-BU-2021-MP-00001', 'BALLOT_UNIT',   'Bharat Electronics Limited',       2021, 'SN-BU-00004', 3, 8, N'Indore District Warehouse','DEPLOYED',     1);
+('EVM-DM-2022-UP-00001', 'DMM',           'Bharat Electronics Limited',       2022, 'SN-DM-00001', 2, 5, N'Agra District Warehouse',  'IN_WAREHOUSE', 1),
+('EVM-CU-2021-MP-00001', 'CONTROL_UNIT',  'Electronics Corporation of India', 2021, 'SN-CU-00004', 3, 7, N'Bhopal State Warehouse',   'IN_WAREHOUSE', 1),
+('EVM-BU-2021-MP-00001', 'BALLOT_UNIT',   'Bharat Electronics Limited',       2021, 'SN-BU-00004', 3, 8, N'Indore District Warehouse','IN_WAREHOUSE', 1);
 GO
 
 -- ============================================================

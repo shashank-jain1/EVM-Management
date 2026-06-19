@@ -56,7 +56,7 @@ public class ReportsController : ControllerBase
                       COUNT(*) AS totalUnits,
                       SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS controlUnits,
                       SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS ballotUnits,
-                      SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS vvpatUnits
+                      SUM(CASE WHEN e.unit_type = 'DMM' THEN 1 ELSE 0 END) AS dmmUnits
                FROM evm_units e
                LEFT JOIN states s ON e.current_state_id = s.state_id
                LEFT JOIN districts d ON e.current_district_id = d.district_id
@@ -276,7 +276,7 @@ public class ReportsController : ControllerBase
             $@"SELECT COALESCE(d.district_name, 'State Headquarters') AS DistrictName, COUNT(*) AS TotalUnits,
                      SUM(CASE WHEN e.unit_type = 'CONTROL_UNIT' THEN 1 ELSE 0 END) AS ControlUnits,
                      SUM(CASE WHEN e.unit_type = 'BALLOT_UNIT' THEN 1 ELSE 0 END) AS BallotUnits,
-                     SUM(CASE WHEN e.unit_type = 'VVPAT' THEN 1 ELSE 0 END) AS Vvpats
+                     SUM(CASE WHEN e.unit_type = 'DMM' THEN 1 ELSE 0 END) AS Dmms
               FROM evm_units e
               LEFT JOIN districts d ON e.current_district_id = d.district_id
               WHERE {districtWhere}
@@ -427,5 +427,5 @@ public class DashboardDistrictAllocationDto
     public int TotalUnits { get; set; }
     public int ControlUnits { get; set; }
     public int BallotUnits { get; set; }
-    public int Vvpats { get; set; }
+    public int Dmms { get; set; }
 }

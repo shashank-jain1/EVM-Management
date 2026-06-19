@@ -4,14 +4,14 @@ public class EvmUnit
 {
     public int UnitId { get; set; }
     public string UnitCode { get; set; } = string.Empty;
-    public string UnitType { get; set; } = string.Empty; // CONTROL_UNIT | BALLOT_UNIT | VVPAT
+    public string UnitType { get; set; } = string.Empty; // CONTROL_UNIT | BALLOT_UNIT | DMM
     public string Manufacturer { get; set; } = string.Empty;
     public int ManufacturingYear { get; set; }
     public string SerialNumber { get; set; } = string.Empty;
     public int? CurrentStateId { get; set; }
     public int? CurrentDistrictId { get; set; }
     public string? CurrentLocationDescription { get; set; }
-    public string CurrentStatus { get; set; } = "IN_WAREHOUSE"; // IN_WAREHOUSE | IN_TRANSIT | DEPLOYED | FAULTY | DECOMMISSIONED | RETURNED
+    public string CurrentStatus { get; set; } = "IN_WAREHOUSE"; // IN_WAREHOUSE | IN_TRANSIT
     public bool IsActive { get; set; } = true;
     public int CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -80,7 +80,7 @@ public class EvmMovementHistory
 {
     public int HistoryId { get; set; }
     public int UnitId { get; set; }
-    public string ActionType { get; set; } = string.Empty; // REGISTERED | DISPATCHED | RECEIVED | DEPLOYED | RETURNED | REPORTED_FAULTY | DECOMMISSIONED
+    public string ActionType { get; set; } = string.Empty; // REGISTERED | DISPATCHED | RECEIVED
     public int? BatchId { get; set; }
     public int? FromStateId { get; set; }
     public int? FromDistrictId { get; set; }

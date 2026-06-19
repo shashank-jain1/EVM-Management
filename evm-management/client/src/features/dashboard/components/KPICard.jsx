@@ -27,9 +27,9 @@ export default function KPICard({ title, value, detail, icon: Icon, trend, trend
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-3 md:mt-4 pt-2.5 md:pt-3 border-t border-slate-200/50 text-[10px] md:text-xs gap-1">
-        <span className="text-slate-450 font-sans truncate pr-2" title={detail}>
+        <div className="truncate pr-2" title={typeof detail === 'string' ? detail : undefined}>
           {detail}
-        </span>
+        </div>
         {trend && (
           <span
             className={clsx(

@@ -22,7 +22,7 @@ const evmSchema = zod.object({
     .min(5, 'Unit Code must be at least 5 characters')
     .max(100, 'Unit Code must be under 100 characters')
     .regex(/^[A-Za-z0-9-]+$/, 'Unit Code must be alphanumeric (dashes permitted)'),
-  unitType: zod.enum(['CONTROL_UNIT', 'BALLOT_UNIT', 'VVPAT'], {
+  unitType: zod.enum(['CONTROL_UNIT', 'BALLOT_UNIT', 'DMM'], {
     errorMap: () => ({ message: 'Please select a valid unit type' }),
   }),
   boxNum: zod.string().min(1, 'Box is required'),
@@ -102,7 +102,7 @@ export default function EVMRegisterPage() {
   const typeOptions = [
     { label: t('Control Unit (CU)'), value: 'CONTROL_UNIT' },
     { label: t('Ballot Unit (BU)'), value: 'BALLOT_UNIT' },
-    { label: t('VVPAT'), value: 'VVPAT' },
+    { label: t('DMM'), value: 'DMM' },
   ];
 
   if (!hasScanned) {

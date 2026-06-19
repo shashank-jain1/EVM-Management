@@ -144,7 +144,7 @@ export default function ReportsPage() {
       { header: t('District Location'), accessor: 'districtName', render: (val) => val || t('State Pool') },
       { header: t('Control Units (CU)'), accessor: 'controlUnits', render: (val) => <span className="font-mono text-xs font-semibold text-gray-800">{val}</span> },
       { header: t('Ballot Units (BU)'), accessor: 'ballotUnits', render: (val) => <span className="font-mono text-xs font-semibold text-gray-800">{val}</span> },
-      { header: t('VVPATs'), accessor: 'vvpatUnits', render: (val) => <span className="font-mono text-xs font-semibold text-gray-800">{val}</span> },
+      { header: t('DMMs'), accessor: 'dmmUnits', render: (val) => <span className="font-mono text-xs font-semibold text-gray-800">{val}</span> },
       { header: t('Total Units'), accessor: 'totalUnits', render: (val) => <span className="font-mono text-xs font-extrabold text-navy-955">{val}</span> },
     ];
 

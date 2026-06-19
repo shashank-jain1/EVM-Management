@@ -115,24 +115,10 @@ export default function EVMDetailPage() {
   // Allowed status options based on role hierarchy and current status
   const getStatusOptions = () => {
     const options = [];
-    if (evm.currentStatus === 'IN_WAREHOUSE' || evm.currentStatus === 'RETURNED') {
-      options.push({ label: t('Mark as Faulty / Repair Needed'), value: 'FAULTY' });
-      if (user?.role === 'ADMIN') {
-        options.push({ label: t('Decommission / Scrap Unit'), value: 'DECOMMISSIONED' });
-      }
-    } else if (evm.currentStatus === 'FAULTY') {
-      options.push({ label: t('Return to Warehouse (Repaired)'), value: 'RETURNED' });
-      if (user?.role === 'ADMIN') {
-        options.push({ label: t('Decommission / Scrap Unit'), value: 'DECOMMISSIONED' });
-      }
-    } else if (evm.currentStatus === 'DEPLOYED') {
-      options.push({ label: t('Mark as Faulty (Booth replacement)'), value: 'FAULTY' });
-      options.push({ label: t('Return to Warehouse (Post-election)'), value: 'RETURNED' });
-    }
     return options;
   };
 
-  const statusChangeAllowed = isOfficer && getStatusOptions().length > 0 && evm.currentStatus !== 'IN_TRANSIT' && evm.currentStatus !== 'DECOMMISSIONED';
+  const statusChangeAllowed = false;
 
   return (
     <div className="space-y-6">

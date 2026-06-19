@@ -67,13 +67,13 @@ export function useDashboardData() {
   const totalUnits = Object.values(statusCounts).reduce((a, b) => a + b, 0);
   const controlUnits = unitsByDistrict.reduce((sum, row) => sum + (row.controlUnits || 0), 0);
   const ballotUnits = unitsByDistrict.reduce((sum, row) => sum + (row.ballotUnits || 0), 0);
-  const vvpatUnits = unitsByDistrict.reduce((sum, row) => sum + (row.vvpats || row.vvpaTs || 0), 0);
+  const dmmUnits = unitsByDistrict.reduce((sum, row) => sum + (row.dmms || row.dmmUnits || 0), 0);
 
   const kpis = {
     totalUnits,
     controlUnits,
     ballotUnits,
-    vvpatUnits,
+    dmmUnits,
     sentUnits: dashboardData.sentUnits || 0,
     receivedUnits: dashboardData.receivedUnits || 0,
   };
@@ -89,7 +89,7 @@ export function useDashboardData() {
     districtName: row.districtName,
     controlUnits: row.controlUnits,
     ballotUnits: row.ballotUnits,
-    vvpatUnits: row.vvpats || row.vvpaTs || 0,
+    dmmUnits: row.dmms || row.dmmUnits || 0,
   }));
 
   const recentDispatches = dispatchesQuery.data || [];

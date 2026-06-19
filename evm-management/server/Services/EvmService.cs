@@ -97,10 +97,6 @@ public class EvmService : IEvmService
 
     private static string MapStatusToAction(string status) => status switch
     {
-        "DEPLOYED" => "DEPLOYED",
-        "RETURNED" => "RETURNED",
-        "FAULTY" => "REPORTED_FAULTY",
-        "DECOMMISSIONED" => "DECOMMISSIONED",
         _ => "DISPATCHED",
     };
 }

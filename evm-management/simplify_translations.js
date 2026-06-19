@@ -89,9 +89,6 @@ const simplifiedHi = {
   'moving': 'रास्ते में',
   'flagged': 'गड़बड़ (फ्लैग)',
   '0 flagged': '0 गड़बड़',
-  'Deployed Units': 'तैनात ईवीएम',
-  'Installed at active polling booths': 'मतदान केंद्रों पर तैनात',
-  'Active booths': 'सक्रिय मतदान केंद्र',
   'Faulty / Repair': 'खराब / मरम्मत',
   'Reported damaged/faulty units': 'खराब/क्षतिग्रस्त ईवीएम',
   'EVM Operations panel': 'ईवीएम संचालन',
@@ -125,13 +122,13 @@ const simplifiedHi = {
   'EVM Inventory Status Allocation': 'ईवीएम स्टेटस',
   'No status distribution data available.': 'कोई डेटा उपलब्ध नहीं है।',
   'In Warehouse': 'गोदाम में',
-  'Deployed (Polling)': 'तैनात',
   'CU': 'कंट्रोल यूनिट (CU)',
   'BU': 'बैलेट यूनिट (BU)',
-  'VVPAT': 'वीवीपीएटी (VVPAT)',
+  'DMM': 'डीएमएम (DMM)',
   'CU:': 'कंट्रोल यूनिट (CU):',
   'BU:': 'बैलेट यूनिट (BU):',
-  'VVPATs': 'वीवीपीएटी (VVPAT)',
+  'DMMs': 'डीएमएम (DMM)',
+  'DMMs:': 'डीएमएम (DMM):',
 
   // EVM List UI
   'Unit Code': 'यूनिट कोड',
@@ -182,7 +179,7 @@ const simplifiedHi = {
   'Staged Inventory Summary': 'तैयार इन्वेंटरी का सारांश',
   'Control Units (CU):': 'कंट्रोल यूनिट (CU):',
   'Ballot Units (BU):': 'बैलेट यूनिट (BU):',
-  'VVPATs:': 'वीवीपीएटी (VVPAT):',
+  'DMMs:': 'डीएमएम (DMM):',
   'Total Units:': 'कुल यूनिट:',
   'Shipment Details': 'शिपमेंट विवरण',
   'Consignment Details': 'शिपमेंट विवरण',
@@ -210,14 +207,11 @@ const simplifiedHi = {
   // EVM statuses
   'IN_WAREHOUSE': 'गोदाम में',
   'IN_TRANSIT': 'रास्ते में',
-  'DEPLOYED': 'तैनात',
-  'FAULTY': 'खराब',
-  'DECOMMISSIONED': 'सेवामुक्त',
-  'RETURNED': 'लौटाया गया',
 
   // Unit categories
   'CONTROL_UNIT': 'कंट्रोल यूनिट (CU)',
   'BALLOT_UNIT': 'मतपत्र इकाई (BU)',
+  'DMM': 'डीएमएम (DMM)',
 
   // Roles translation
   'ADMIN': 'सिस्टम एडमिन',
@@ -291,7 +285,7 @@ const simplifiedHi = {
   'Cancel Dispatch consignment': 'डिस्पैच रद्द करें',
   'Warning': 'चेतावनी',
   'Cancelling a shipment cannot be undone. All devices in this shipment will automatically return to the sender warehouse location.': 'शिपमेंट रद्द करना बदला नहीं जा सकता। सभी डिवाइस भेजने वाले के पास वापस चले जाएंगे।',
-  'Cancelling a consignment is irreversible. All associated devices (CUs, BUs, VVPATs) will be automatically returned to the shipping warehouse custody.': 'शिपमेंट रद्द करना बदला नहीं जा सकता। सभी डिवाइस भेजने वाले के पास वापस चले जाएंगे।',
+  'Cancelling a consignment is irreversible. All associated devices (CUs, BUs) will be automatically returned to the shipping warehouse custody.': 'शिपमेंट रद्द करना बदला नहीं जा सकता। सभी डिवाइस भेजने वाले के पास वापस चले जाएंगे।',
   'Cancellation Reason / Audit notes': 'रद्द करने का कारण',
   'E.g. Security convoy rescheduled, typo in destination warehouse state, etc.': 'जैसे सुरक्षा कारण, गलत गंतव्य, आदि।',
   'Back': 'पीछे',
@@ -384,16 +378,13 @@ const simplifiedHi = {
   'EVM Management': 'ईवीएम प्रबंधन',
 
   // Badges & Labels translations
-  'Deployed': 'तैनात',
-  'Faulty': 'खराब',
-  'Decommissioned': 'सेवामुक्त',
-  'Returned': 'लौटाया गया',
   'Pending': 'लंबित',
   'Received': 'प्राप्त',
   'Partial': 'आंशिक',
   'Cancelled': 'रद्द',
   'Control Unit': 'कंट्रोल यूनिट (CU)',
   'Ballot Unit': 'मतपत्र इकाई (BU)',
+  'DMM': 'डीएमएम (DMM)',
   'Dispatched': 'भेजा गया',
   'Missing': 'गायब',
   'Damaged': 'क्षतिग्रस्त',
@@ -418,7 +409,7 @@ const simplifiedHi = {
 
   // Dispatch & Registration Translations
   'Ballot Unit (BU)': 'मतपत्र इकाई (BU)',
-  'Deployed (Booths)': 'तैनात (मतदान केंद्र)',
+  'DMM': 'डीएमएम (DMM)',
   'Full registry of all Electronic Voting Machine devices allocated across India.': 'ईवीएम की पूर्ण सूची।',
   'Filter Catalog': 'फ़िल्टर',
   'Search Unit Code / Serial No...': 'यूनिट कोड / सीरियल नंबर खोजें...',

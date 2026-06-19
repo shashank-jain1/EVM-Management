@@ -65,7 +65,7 @@ GO
 CREATE TABLE evm_units (
     unit_id                   INT IDENTITY(1,1) PRIMARY KEY,
     unit_code                 NVARCHAR(100) NOT NULL UNIQUE,
-    unit_type                 NVARCHAR(20)  NOT NULL CHECK (unit_type IN ('CONTROL_UNIT', 'BALLOT_UNIT', 'VVPAT')),
+    unit_type                 NVARCHAR(20)  NOT NULL CHECK (unit_type IN ('CONTROL_UNIT', 'BALLOT_UNIT', 'DMM')),
     manufacturer              NVARCHAR(100) NOT NULL,
     manufacturing_year        INT           NOT NULL,
     serial_number             NVARCHAR(100) NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE evm_units (
     current_district_id       INT           REFERENCES districts(district_id),
     current_location_description NVARCHAR(255),
     current_status            NVARCHAR(30)  NOT NULL DEFAULT 'IN_WAREHOUSE'
-                              CHECK (current_status IN ('IN_WAREHOUSE','IN_TRANSIT','DEPLOYED','FAULTY','DECOMMISSIONED','RETURNED')),
+                              CHECK (current_status IN ('IN_WAREHOUSE','IN_TRANSIT')),
     is_active                 BIT           NOT NULL DEFAULT 1,
     created_by                INT           NOT NULL REFERENCES users(user_id),
     created_at                DATETIME2     NOT NULL DEFAULT GETDATE(),
@@ -129,7 +129,7 @@ CREATE TABLE evm_movement_history (
     history_id      INT IDENTITY(1,1) PRIMARY KEY,
     unit_id         INT           NOT NULL REFERENCES evm_units(unit_id),
     action_type     NVARCHAR(30)  NOT NULL
-                    CHECK (action_type IN ('REGISTERED','DISPATCHED','RECEIVED','DEPLOYED','RETURNED','REPORTED_FAULTY','DECOMMISSIONED')),
+                    CHECK (action_type IN ('REGISTERED','DISPATCHED','RECEIVED')),
     batch_id        INT           REFERENCES dispatch_batches(batch_id),
     from_state_id   INT           REFERENCES states(state_id),
     from_district_id INT          REFERENCES districts(district_id),

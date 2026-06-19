@@ -103,16 +103,12 @@ export default function EVMListPage() {
   const unitTypeOptions = [
     { label: t('Control Unit (CU)'), value: 'CONTROL_UNIT' },
     { label: t('Ballot Unit (BU)'), value: 'BALLOT_UNIT' },
-    { label: t('VVPAT'), value: 'VVPAT' },
+    { label: t('DMM'), value: 'DMM' },
   ];
 
   const statusOptions = [
     { label: t('In Warehouse'), value: 'IN_WAREHOUSE' },
     { label: t('Receiving pending'), value: 'IN_TRANSIT' },
-    { label: t('Deployed (Booths)'), value: 'DEPLOYED' },
-    { label: t('Faulty'), value: 'FAULTY' },
-    { label: t('Returned'), value: 'RETURNED' },
-    { label: t('Decommissioned'), value: 'DECOMMISSIONED' },
   ];
 
   const columns = [

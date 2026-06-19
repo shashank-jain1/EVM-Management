@@ -53,12 +53,6 @@ export function useDispatch() {
         addToast(t("Unit is already receiving pending."), 'error');
         return;
       }
-      
-      // Business Rule: Cannot dispatch units that are decommissioned
-      if (unit.currentStatus === 'DECOMMISSIONED') {
-        addToast(`Unit ${code} has been decommissioned and cannot be dispatched.`, 'error');
-        return;
-      }
 
       setScannedUnits((prev) => [...prev, unit]);
       addToast(`Unit ${code} added to consignment`, 'success');
@@ -94,10 +88,10 @@ export function useDispatch() {
       (acc, unit) => {
         if (unit.unitType === 'CONTROL_UNIT') acc.CONTROL_UNIT += 1;
         else if (unit.unitType === 'BALLOT_UNIT') acc.BALLOT_UNIT += 1;
-        else if (unit.unitType === 'VVPAT') acc.VVPAT += 1;
+        else if (unit.unitType === 'DMM') acc.DMM += 1;
         return acc;
       },
-      { CONTROL_UNIT: 0, BALLOT_UNIT: 0, VVPAT: 0 }
+      { CONTROL_UNIT: 0, BALLOT_UNIT: 0, DMM: 0 }
     );
   };
 

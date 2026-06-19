@@ -12,19 +12,11 @@ import { useTranslation } from '@/components/common/LanguageContext';
 const STATUS_COLORS = {
   IN_WAREHOUSE: '#2563EB',      // Blue
   IN_TRANSIT: '#D97706',        // Amber
-  DEPLOYED: '#059669',          // Success/Green
-  FAULTY: '#DC2626',            // Red
-  DECOMMISSIONED: '#4A5568',    // Grey
-  RETURNED: '#7C3AED',          // Violet
 };
 
 const STATUS_LABELS = {
   IN_WAREHOUSE: 'In Warehouse',
   IN_TRANSIT: 'Receiving pending',
-  DEPLOYED: 'Deployed (Polling)',
-  FAULTY: 'Faulty / Repair',
-  DECOMMISSIONED: 'Decommissioned',
-  RETURNED: 'Returned',
 };
 
 export default function StatusDonut({ data }) {

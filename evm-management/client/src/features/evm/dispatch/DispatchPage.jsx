@@ -220,9 +220,9 @@ export default function DispatchPage() {
             {/* Stage bottom panel */}
             <div className="pt-5 border-t border-gray-100 mt-6 flex justify-between items-center">
               <div className="text-xs font-sans text-gray-500">
-                {t('Summary')}: <span className="font-bold text-gray-800">{unitCounts.CONTROL_UNIT} {t('CU')}</span> |{' '}
+                {t('Summary')}:                 <span className="font-bold text-gray-800">{unitCounts.CONTROL_UNIT} {t('CU')}</span> |{' '}
                 <span className="font-bold text-gray-800">{unitCounts.BALLOT_UNIT} {t('BU')}</span> |{' '}
-                <span className="font-bold text-gray-800">{unitCounts.VVPAT} {t('VVPAT')}</span>
+                <span className="font-bold text-gray-800">{unitCounts.DMM} {t('DMM')}</span>
               </div>
               
               <Button

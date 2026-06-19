@@ -110,8 +110,8 @@ public class DispatchService : IDispatchService
             else
             {
                 allReceived = false;
-                // Mark faulty/missing units accordingly
-                var newStatus = receipt.ItemStatus == "MISSING" ? "IN_WAREHOUSE" : "FAULTY";
+                // Mark missing units - received units go to IN_WAREHOUSE
+                var newStatus = "IN_WAREHOUSE";
                 await _evmRepo.UpdateUnitStatusAsync(receipt.UnitId, newStatus, userStateId, userDistrictId, null);
             }
         }

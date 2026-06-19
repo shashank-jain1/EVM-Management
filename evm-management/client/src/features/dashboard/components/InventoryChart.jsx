@@ -14,13 +14,11 @@ import { useTranslation } from '@/components/common/LanguageContext';
 export default function InventoryChart({ data }) {
   const { t } = useTranslation();
 
-  // Format data for Recharts: expect objects like { districtName, controlUnits, ballotUnits, vvpatUnits }
-  // Map or clean the keys to user-friendly titles
   const chartData = data.map((item) => ({
     name: item.districtName || 'Unknown',
     [t('Control Units')]: item.controlUnits || 0,
     [t('Ballot Units')]: item.ballotUnits || 0,
-    [t('VVPATs')]: item.vvpatUnits || 0,
+    [t('DMMs')]: item.dmmUnits || 0,
   }));
 
   return (
@@ -80,7 +78,7 @@ export default function InventoryChart({ data }) {
               />
               <Bar dataKey={t('Control Units')} fill="var(--color-navy-700)" radius={[2, 2, 0, 0]} />
               <Bar dataKey={t('Ballot Units')} fill="var(--color-navy-500)" radius={[2, 2, 0, 0]} />
-              <Bar dataKey={t('VVPATs')} fill="var(--color-saffron-500)" radius={[2, 2, 0, 0]} />
+              <Bar dataKey={t('DMMs')} fill="var(--color-saffron-500)" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

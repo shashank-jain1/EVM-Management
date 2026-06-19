@@ -1,14 +1,10 @@
 import clsx from 'clsx';
-import { CheckCircle2, Truck, Package, AlertTriangle, RotateCcw, Wrench, Trash2, PlusCircle } from 'lucide-react';
+import { CheckCircle2, Truck, PlusCircle } from 'lucide-react';
 
 const ACTION_ICONS = {
   REGISTERED:      <PlusCircle size={16} className="text-blue-500" />,
   DISPATCHED:      <Truck size={16} className="text-amber-500" />,
   RECEIVED:        <CheckCircle2 size={16} className="text-green-500" />,
-  DEPLOYED:        <Package size={16} className="text-purple-500" />,
-  RETURNED:        <RotateCcw size={16} className="text-gray-500" />,
-  REPORTED_FAULTY: <AlertTriangle size={16} className="text-red-500" />,
-  DECOMMISSIONED:  <Trash2 size={16} className="text-gray-400" />,
 };
 
 /**

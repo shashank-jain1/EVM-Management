@@ -153,10 +153,6 @@ input:focus, select:focus, textarea:focus {
 /* Status Badge Color Schemes */
 .status-in-warehouse  { @apply bg-violet-50 text-violet-700 border border-violet-100 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }
 .status-in-transit    { @apply bg-amber-50 text-amber-700 border border-amber-100 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }
-.status-deployed      { @apply bg-emerald-50 text-emerald-700 border border-emerald-100 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }
-.status-faulty        { @apply bg-red-50 text-red-700 border border-red-100 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }
-.status-decommissioned{ @apply bg-slate-100 text-slate-600 border border-slate-200 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }
-.status-returned      { @apply bg-indigo-50 text-indigo-700 border border-indigo-100 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }
 .status-received      { @apply bg-emerald-50 text-emerald-700 border border-emerald-100 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }
 .status-cancelled     { @apply bg-rose-50 text-rose-700 border border-rose-100 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }
 .status-pending       { @apply bg-amber-50 text-amber-700 border border-amber-100 font-semibold px-2.5 py-1 rounded-full text-[11px] tracking-wide; }

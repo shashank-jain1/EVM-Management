@@ -5,7 +5,6 @@ import KPICard from './components/KPICard';
 import RecentDispatches from './components/RecentDispatches';
 import PendingReceipts from './components/PendingReceipts';
 import InventoryChart from './components/InventoryChart';
-import StatusDonut from './components/StatusDonut';
 import Button from '@/components/common/Button';
 import Spinner from '@/components/common/Spinner';
 import { Cpu, Truck, Download, ShieldAlert, PlusCircle, BarChart3, RefreshCw, Search } from 'lucide-react';
@@ -18,7 +17,6 @@ export default function DashboardPage() {
   const { t } = useTranslation();
   const {
     kpis,
-    statusBreakdown,
     districtBreakdown,
     recentDispatches,
     pendingReceipts,
@@ -80,7 +78,19 @@ export default function DashboardPage() {
         <KPICard
           title={t("Total EVMs")}
           value={kpis.totalUnits}
-          detail={`${t("CU")}: ${kpis.controlUnits} | ${t("BU")}: ${kpis.ballotUnits} | ${t("VVPAT")}: ${kpis.vvpatUnits}`}
+          detail={
+            <span className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 font-bold text-[11px] border border-sky-200">
+                CU: {kpis.controlUnits}
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-violet-100 text-violet-800 font-bold text-[11px] border border-violet-200">
+                BU: {kpis.ballotUnits}
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-pink-100 text-pink-800 font-bold text-[11px] border border-pink-200">
+                DMM: {kpis.dmmUnits}
+              </span>
+            </span>
+          }
           icon={Cpu}
           className="border-t-4 border-t-blue-500"
         />
@@ -127,11 +137,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recharts Analytics Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <InventoryChart data={districtBreakdown} />
-        <StatusDonut data={statusBreakdown} />
-      </div>
+      {/* Recharts Analytics */}
+      <InventoryChart data={districtBreakdown} />
 
       {/* Recent Dispatches table */}
       <RecentDispatches dispatches={recentDispatches} />

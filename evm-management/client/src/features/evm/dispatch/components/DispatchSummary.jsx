@@ -3,7 +3,7 @@ import { useTranslation } from '@/components/common/LanguageContext';
 
 export default function DispatchSummary({ fromLocation, toLocation, unitCounts }) {
   const { t } = useTranslation();
-  const totalCounts = unitCounts.CONTROL_UNIT + unitCounts.BALLOT_UNIT + unitCounts.VVPAT;
+  const totalCounts = unitCounts.CONTROL_UNIT + unitCounts.BALLOT_UNIT + unitCounts.DMM;
 
   return (
     <div className="bg-white border border-gray-200 border-t-4 border-t-navy-955 rounded-lg p-5 shadow-sm space-y-5">
@@ -49,8 +49,8 @@ export default function DispatchSummary({ fromLocation, toLocation, unitCounts }
               <span className="font-bold text-gray-800">{unitCounts.BALLOT_UNIT}</span>
             </div>
             <div className="flex justify-between">
-              <span>{t('VVPATs:')}</span>
-              <span className="font-bold text-gray-800">{unitCounts.VVPAT}</span>
+              <span>{t('DMMs:')}</span>
+              <span className="font-bold text-gray-800">{unitCounts.DMM}</span>
             </div>
             <div className="flex justify-between pt-2 border-t border-gray-200 text-xs font-bold text-navy-950">
               <span>{t('Total Units:')}</span>
