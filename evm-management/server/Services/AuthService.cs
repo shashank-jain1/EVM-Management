@@ -2,6 +2,7 @@ using BCrypt.Net;
 using EVMManagement.Api.DTOs.Auth;
 using EVMManagement.Api.Models;
 using EVMManagement.Api.Repositories;
+using EVMManagement.Api.Data;
 using EVMManagement.Api.Utils;
 
 namespace EVMManagement.Api.Services;
@@ -19,13 +20,15 @@ public class AuthService : IAuthService
     private readonly JwtHelper _jwtHelper;
     private readonly IAuditLogger _audit;
     private readonly ILogger<AuthService> _logger;
+    private readonly DbConnectionFactory _db;
 
-    public AuthService(IUserRepository userRepo, JwtHelper jwtHelper, IAuditLogger audit, ILogger<AuthService> logger)
+    public AuthService(IUserRepository userRepo, JwtHelper jwtHelper, IAuditLogger audit, ILogger<AuthService> logger, DbConnectionFactory db)
     {
         _userRepo = userRepo;
         _jwtHelper = jwtHelper;
         _audit = audit;
         _logger = logger;
+        _db = db;
     }
 
     public async Task<LoginResponse> LoginAsync(string userCode, string password, string? ipAddress, string? userAgent)
@@ -57,8 +60,8 @@ public class AuthService : IAuthService
             _logger.LogInformation("Self-healing ADMIN001 password hash in database...");
             var newHash = BCrypt.Net.BCrypt.HashPassword(password);
             
-            // Execute update directly using the repository's connection
-            using var conn = new Microsoft.Data.SqlClient.SqlConnection("Server=4.224.241.80,1433;Database=evm_management;User Id=sedtest;Password=sed##2025@@DPI;Encrypt=true;TrustServerCertificate=true;Connection Timeout=30;");
+            // Execute update using the injected connection factory
+            using var conn = _db.CreateConnection();
             await Dapper.SqlMapper.ExecuteAsync(conn, "UPDATE users SET password_hash = @H WHERE user_code = 'ADMIN001'", new { H = newHash });
             
             passwordMatch = true; // allow login to proceed
